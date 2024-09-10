@@ -25,6 +25,12 @@ namespace PlateauToolkit.Sandbox
             {
                 if (TryGetAndCacheReference(collider, parent.gameObject, out sandboxPlaceableObject))
                 {
+                    if (sandboxPlaceableObject.CanPlaceOnOtherSandboxObject())
+                    {
+                        // 他のオブジェクトを配置できるようにフラグをfalseにする
+                        return false;
+                    }
+
                     return true;
                 }
 
