@@ -16,6 +16,11 @@ namespace PlateauToolkit.Sandbox
                         throw new System.NullReferenceException("The reference is broken");
                     }
                     sandboxPlaceableObject = reference.SandboxObject;
+                    if (sandboxPlaceableObject.CanPlaceOnOtherSandboxObject())
+                    {
+                        return false;
+                    }
+
                     return true;
                 }
             }
@@ -27,7 +32,6 @@ namespace PlateauToolkit.Sandbox
                 {
                     if (sandboxPlaceableObject.CanPlaceOnOtherSandboxObject())
                     {
-                        // 他のオブジェクトを配置できるようにフラグをfalseにする
                         return false;
                     }
 
