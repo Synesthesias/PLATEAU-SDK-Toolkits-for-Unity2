@@ -18,6 +18,7 @@ namespace PlateauToolkit.Sandbox
                     sandboxPlaceableObject = reference.SandboxObject;
                     if (sandboxPlaceableObject.CanPlaceOnOtherSandboxObject())
                     {
+                        // 他のSandboxオブジェクトを上に配置できるようにfalseを返す
                         return false;
                     }
 
@@ -32,6 +33,7 @@ namespace PlateauToolkit.Sandbox
                 {
                     if (sandboxPlaceableObject.CanPlaceOnOtherSandboxObject())
                     {
+                        // 他のSandboxオブジェクトを上に配置できるようにfalseを返す
                         return false;
                     }
 
