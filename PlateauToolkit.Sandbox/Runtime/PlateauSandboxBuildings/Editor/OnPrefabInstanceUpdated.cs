@@ -84,28 +84,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
 
         private static void SaveAssets(GameObject obj, Runtime.PlateauSandboxBuilding buildingGeneratorComponent)
         {
-            string meshAssetsFolderPath = BuildingMeshUtility.GetMeshAssetsFolderPath();
-            if (!Directory.Exists(meshAssetsFolderPath))
-            {
-                Directory.CreateDirectory(meshAssetsFolderPath);
-            }
-
-            string prefabAssetsFolderPath = BuildingMeshUtility.GetPrefabAssetsFolderPath();
-            if (!Directory.Exists(prefabAssetsFolderPath))
-            {
-                Directory.CreateDirectory(prefabAssetsFolderPath);
-            }
-
+            Runtime.PlateauSandboxBuilding prefab = PrefabUtility.GetCorrespondingObjectFromSource(buildingGeneratorComponent);
+            string prefabPath = AssetDatabase.GetAssetPath(prefab);
             var lsFacadeMeshFilter = obj.transform.GetComponentsInChildren<MeshFilter>().ToList();
-            if (BuildingMeshUtility.SaveMesh(lsFacadeMeshFilter, buildingGeneratorComponent.buildingName))
+            if (!BuildingMeshUtility.SaveMesh(prefabPath, buildingGeneratorComponent.GetBuildingName(), lsFacadeMeshFilter))
             {
-                OnPrefabInstanceUpdatedParameter.instance.canUpdate = false;
-                string prefabPath = Path.Combine(prefabAssetsFolderPath, buildingGeneratorComponent.buildingName + ".prefab").Replace("\\", "/");
-                PrefabUtility.SaveAsPrefabAssetAndConnect(obj, prefabPath, InteractionMode.AutomatedAction);
+                EditorUtility.DisplayDialog("建築物のメッシュ保存に失敗", "建築物の保存に失敗しました。建築物を再生成して下さい。", "はい");
                 return;
             }
 
-            EditorUtility.DisplayDialog("建築物のメッシュを保存", "建築物の保存に失敗しました。建築物を再生成して下さい。", "はい");
+            OnPrefabInstanceUpdatedParameter.instance.canUpdate = false;
+            PrefabUtility.SaveAsPrefabAssetAndConnect(obj, prefabPath, InteractionMode.AutomatedAction);
         }
     }
 }
