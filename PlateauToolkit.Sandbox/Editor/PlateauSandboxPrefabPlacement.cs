@@ -163,7 +163,7 @@ namespace PlateauToolkit.Sandbox.Editor
             }
             else if (isAllPlaceFailed)
             {
-                EditorUtility.DisplayDialog("アセット一括配置", "全てのアセットの配置に失敗しました。", "OK");
+                EditorUtility.DisplayDialog("アセット一括配置", "全てのアセットの配置に失敗しました。\n詳細はコンソールログのワーニングを確認してください。", "OK");
             }
             else
             {
