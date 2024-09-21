@@ -17,7 +17,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                  return Path.Combine(prefabPath, "Meshes");
             }
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-            int lastSlashIndex = directoryName.LastIndexOf('/');
+            int lastSlashIndex = prefabFolderPath.LastIndexOf('/');
 #elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             int lastSlashIndex = prefabFolderPath.LastIndexOf('\\');
 #endif

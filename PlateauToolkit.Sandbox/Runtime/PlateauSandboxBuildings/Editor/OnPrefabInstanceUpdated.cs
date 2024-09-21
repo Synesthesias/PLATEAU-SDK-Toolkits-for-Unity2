@@ -1,4 +1,3 @@
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -8,7 +7,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
 {
     public class OnPrefabInstanceUpdatedParameter : ScriptableSingleton<OnPrefabInstanceUpdatedParameter>
     {
-        public bool canUpdate = true;
+        public bool canUpdatePrefabInstance = true;
         public bool prefabStageDirtied;
     }
 
@@ -23,11 +22,11 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
             OnPrefabInstanceUpdatedParameter.instance.prefabStageDirtied = false;
 
             PrefabUtility.prefabInstanceUpdated += OnPrefabInstanceUpdate;
-            OnPrefabInstanceUpdatedParameter.instance.canUpdate = true;
+            OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance = true;
         }
 
         /// <summary>
-        /// Prefab ModeでPrefabを開いたときに呼び出される
+        /// Prefab ModeでPrefabを開いた時にコール
         /// </summary>
         private static void PrefabStageOnPrefabStageOpened(PrefabStage obj)
         {
@@ -35,7 +34,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
         }
 
         /// <summary>
-        /// Prefabを編集して差分が出た際に呼び出される
+        /// Prefabを編集して差分が出た時にコール
         /// </summary>
         private static void PrefabStageOnPrefabStageDirtied(PrefabStage obj)
         {
@@ -43,7 +42,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
         }
 
         /// <summary>
-        /// Prefab Modeを閉じたときに呼び出される
+        /// Prefab Modeを閉じた時にコール
         /// </summary>
         private static void PrefabStageOnPrefabStageClosing(PrefabStage obj)
         {
@@ -57,9 +56,13 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                 return;
             }
 
-            SaveAssets(obj.prefabContentsRoot, buildingGeneratorComponent);
+            SaveAssets(obj.prefabContentsRoot, obj.assetPath, buildingGeneratorComponent);
         }
 
+        /// <summary>
+        /// プレハブ更新時のコールバック
+        /// </summary>
+        /// <param name="instance"></param>
         private static void OnPrefabInstanceUpdate(GameObject instance)
         {
             GameObject selectedGameObject = Selection.activeGameObject;
@@ -68,9 +71,10 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                 return;
             }
 
-            if (OnPrefabInstanceUpdatedParameter.instance.canUpdate == false)
+            // 二重コール回避
+            if (OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance == false)
             {
-                OnPrefabInstanceUpdatedParameter.instance.canUpdate = true;
+                OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance = true;
                 return;
             }
 
@@ -79,13 +83,19 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                 return;
             }
 
-            SaveAssets(instance, buildingGeneratorComponent);
-        }
-
-        private static void SaveAssets(GameObject obj, Runtime.PlateauSandboxBuilding buildingGeneratorComponent)
-        {
             Runtime.PlateauSandboxBuilding prefab = PrefabUtility.GetCorrespondingObjectFromSource(buildingGeneratorComponent);
             string prefabPath = AssetDatabase.GetAssetPath(prefab);
+            SaveAssets(instance, prefabPath, buildingGeneratorComponent);
+        }
+
+        /// <summary>
+        /// メッシュとプレハブを保存
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="prefabPath"></param>
+        /// <param name="buildingGeneratorComponent"></param>
+        private static void SaveAssets(GameObject obj, string prefabPath, Runtime.PlateauSandboxBuilding buildingGeneratorComponent)
+        {
             var lsFacadeMeshFilter = obj.transform.GetComponentsInChildren<MeshFilter>().ToList();
             if (!BuildingMeshUtility.SaveMesh(prefabPath, buildingGeneratorComponent.GetBuildingName(), lsFacadeMeshFilter))
             {
@@ -93,7 +103,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                 return;
             }
 
-            OnPrefabInstanceUpdatedParameter.instance.canUpdate = false;
+            // SaveAsPrefabAssetAndConnectによってOnPrefabInstanceUpdateがコールされるので二重保存を回避
+            OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance = false;
             PrefabUtility.SaveAsPrefabAssetAndConnect(obj, prefabPath, InteractionMode.AutomatedAction);
         }
     }

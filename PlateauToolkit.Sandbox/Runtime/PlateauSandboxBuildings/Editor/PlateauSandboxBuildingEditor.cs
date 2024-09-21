@@ -422,6 +422,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
             return false;
         }
 
+        /// <summary>
+        /// インスペクタ上のプレハブ保存ボタン押下時にコール
+        /// </summary>
         private void SavePrefab()
         {
             if (!PrefabUtility.IsPartOfPrefabInstance(m_Generator.gameObject))
@@ -449,9 +452,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
             m_Generator.gameObject.name = newPrefabName;
             string prefabFullPath = Path.Combine(prefabFolderPath, newPrefabName + ".prefab").Replace("\\", "/");
             PrefabUtility.UnpackPrefabInstance(m_Generator.gameObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
-            OnPrefabInstanceUpdatedParameter.instance.canUpdate = false;
+            OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance = false;
             PrefabUtility.SaveAsPrefabAssetAndConnect(m_Generator.gameObject, prefabFullPath, InteractionMode.AutomatedAction);
-            OnPrefabInstanceUpdatedParameter.instance.canUpdate = true;
+            OnPrefabInstanceUpdatedParameter.instance.canUpdatePrefabInstance = true;
             EditorUtility.DisplayDialog("建築物を新規プレハブとして保存に成功", "建築物のプレハブが正常に保存されました。", "はい");
         }
     }
