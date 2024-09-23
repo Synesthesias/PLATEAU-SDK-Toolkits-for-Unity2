@@ -53,7 +53,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
         protected const float k_WindowDepth = 0.1f;
         protected const float k_WindowWidthOffset = 0.5f;
-        protected const float k_WindowBottomOffset = 1;
+        protected const float k_WindowBottomOffset = 0; // 値を変えると窓の高さが変わる
         protected const float k_WindowTopOffset = 0.3f;
         protected const float k_WindowFrameWidth = 0.05f;
         protected const float k_WindowFrameRodWidth = 0.05f;
