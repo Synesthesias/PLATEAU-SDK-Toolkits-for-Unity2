@@ -251,32 +251,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 .Paint(balconyTexturedData.m_WallMat);
         }
 
-        // private static MeshDraft BalconyBorder(Vector3 origin, Vector3 widthVector, Vector3 balconyHeight, Vector3 balconyDepth, Vector3 innerWidthOffset, Vector3 innerWidth, Vector3 innerDepth, BalconyColorData balconyColorData)
-        // {
-        //     Vector3 borderOrigin = origin + balconyHeight;
-        //     Vector3 borderInnerOrigin = borderOrigin + innerWidthOffset;
-        //     Vector3 innerHeightOffset = Vector3.up * k_BalconyThickness;
-        //
-        //     return new MeshDraft().AddTriangleStrip(new List<Vector3>
-        //         {
-        //             // borderOrigin,
-        //             // borderInnerOrigin,
-        //             borderOrigin - balconyDepth,
-        //             borderInnerOrigin - innerDepth,
-        //             borderOrigin - balconyDepth - balconyHeight,
-        //             borderOrigin - balconyDepth - balconyHeight + innerHeightOffset + innerWidthOffset,
-        //             borderOrigin - balconyDepth - balconyHeight + widthVector,
-        //             borderOrigin - balconyDepth - balconyHeight + innerHeightOffset + widthVector - innerWidthOffset,
-        //             // borderOrigin + widthVector  - balconyDepth,
-        //             // borderOrigin + widthVector - innerWidthOffset - balconyDepth,
-        //             // borderOrigin - balconyHeight + innerHeightOffset - balconyDepth + widthVector,
-        //             // borderInnerOrigin - innerDepth + innerWidth,
-        //             // borderOrigin + widthVector,
-        //             // borderInnerOrigin + innerWidth
-        //         })
-        //         .Paint(balconyColorData.m_WallColor, balconyColorData.m_VertexWallMat);
-        // }
-
         private static MeshDraft BalconyWallPanel(Vector3 origin, Vector3 widthVector, Vector3 heightVector, Vector3 windowDepth, List<Vector3> outerFrame, BalconyColorData balconyColorData)
         {
             MeshDraft wall = new MeshDraft {name = k_WallDraftName}
@@ -343,60 +317,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             compoundDraft.Add(balconyWindowFrame);
 
             return compoundDraft;
-        }
-
-        protected static CompoundMeshDraft BalconyGlazed(
-            Vector3 origin,
-            float width,
-            float height,
-            Color windowpaneGlassColor,
-            Color windowpaneFrameRodsColor,
-            Color windowpaneOuterFrameColor,
-            Material vertexWindowpaneMat)
-        {
-            Vector3 widthVector = Vector3.right*width;
-            Vector3 heightVector = Vector3.up*height;
-
-            Vector3 balconyHeight = Vector3.up*k_BalconyGlassHeight;
-            Vector3 balconyDepth = Vector3.forward*k_BalconyConcaveDepth;
-
-            var compoundDraft = new CompoundMeshDraft();
-
-            // MeshDraft balcony = BalconyOuter(origin, widthVector, balconyHeight, balconyDepth, vertexColorPalette, materialPalette, false, out Vector3 balconyCenter)
-            //     .Paint(vertexColorPalette.wallColor);
-            // balcony.name = k_WallDraftName;
-            // compoundDraft.Add(balcony);
-            //
-            // MeshDraft roof = BalconyGlazedRoof(origin, widthVector, heightVector, balconyDepth, vertexColorPalette.roofColor);
-            // compoundDraft.Add(roof);
-            //
-            // var glassHeight = new Vector3(0, height - k_BalconyHeight, 0);
-            // Vector3 glass0 = origin + balconyHeight;
-            // Vector3 glass1 = glass0 - balconyDepth;
-            // Vector3 glass2 = glass1 + widthVector;
-            //
-            // compoundDraft.Add(Windowpane(glass0, glass1 + glassHeight, vertexColorPalette, materialPalette));
-            // compoundDraft.Add(Windowpane(glass1, glass2 + glassHeight, vertexColorPalette, materialPalette));
-            // compoundDraft.Add(Windowpane(glass2, glass2 + balconyDepth + glassHeight, vertexColorPalette, materialPalette));
-
-            return compoundDraft;
-        }
-
-        private static MeshDraft BalconyGlazedRoof(
-            Vector3 origin,
-            Vector3 widthVector,
-            Vector3 heightVector,
-            Vector3 balconyDepth,
-            Color roofColor)
-        {
-            Vector3 roof0 = origin + heightVector;
-            Vector3 roof1 = roof0 + widthVector;
-            Vector3 roof2 = roof1 - balconyDepth;
-            Vector3 roof3 = roof0 - balconyDepth;
-            var roof = new MeshDraft {name = k_WallDraftName}
-                .AddQuad(roof0, roof1, roof2, roof3, Vector3.up)
-                .Paint(roofColor);
-            return roof;
         }
     }
 }
