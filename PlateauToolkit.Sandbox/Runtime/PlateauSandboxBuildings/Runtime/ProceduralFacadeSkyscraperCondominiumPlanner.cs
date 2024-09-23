@@ -345,7 +345,25 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             for (int i = from; i < to; i++)
             {
                 float panelWidth = m_SizeValues[panelSizes[i]] + floorWidthOffset;
+                if (config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Back)
+                {
+                    Debug.Log($"direction: {directions}");
+                }
+
+                if (from == to - 1 && panelSizes.Count == 1)
+                {
+                    directions |= Directions.Left | Directions.Right;
+                }
+                else if (i == 0)
+                {
+                    directions |= Directions.Left;
+                }
+                else if (i == to - 1 && to == panelSizes.Count)
+                {
+                    directions |= Directions.Right;
+                }
                 Directions directionsLocalScope = directions;
+
                 var balcony = new List<Func<ILayoutElement>>
                 {
                     () => new ProceduralFacadeCompoundElements.ProceduralBalcony(config, directionsLocalScope)
