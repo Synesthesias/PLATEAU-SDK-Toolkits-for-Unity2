@@ -66,7 +66,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         protected const float k_WindowsillDepth = 0.15f;
         protected const float k_WindowsillThickness = 0.05f;
 
-        protected const float k_BalconyDepth = 0.6f;
+        protected const float k_BalconyConcaveDepth = 0.6f;
+        protected const float k_BalconyConvexDepth = 1f;
         protected const float k_BalconyThickness = 0.1f;
         protected const float k_BalconyGlassDepth = 0.1f;
         protected const float k_BalconyGlassHeight = 1;
