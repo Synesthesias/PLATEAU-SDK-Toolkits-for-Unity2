@@ -58,6 +58,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 float wallWidthOffset = Mathf.Max(k_MinWallWidthOffset, remainderWidth);
                 float wallAveWidthOffset = wallWidthOffset / panelSizes.Count;
                 float floorWidthOffset = remainderWidth / panelSizes.Count;
+                float shadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth;
+                float shadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count;
+                float shadowWidth = width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count;
 
                 // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める
                 float floorHeight = 0;
@@ -76,66 +79,36 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 switch (i)
                 {
                     case 0:
-                    {
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Back;
-                        var vertical = new VerticalLayout();
-                        vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
-                        {
-                            m_IsShadowWall = true,
-                            m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
-                            m_ShadowWallHeightOffset = 0
-                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
-                        layouts.Add(vertical);
+                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyBack ? 0 : -k_BalconyConcaveDepth;
                         break;
-                    }
                     case 1:
-                    {
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Right;
-                        var vertical = new VerticalLayout();
-                        vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
-                        {
-                            m_IsShadowWall = true,
-                            m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
-                            m_ShadowWallHeightOffset = 0
-                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
-                        layouts.Add(vertical);
+                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyRight ? 0 : -k_BalconyConcaveDepth;
                         break;
-                    }
                     case 2:
-                    {
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Front;
-                        var vertical = new VerticalLayout();
-                        vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
-                        {
-                            m_IsShadowWall = true,
-                            m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
-                            m_ShadowWallHeightOffset = 0
-                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
-                        vertical.Add(PlanEntranceFacade(panelSizes, floorHeight, remainderWidth, config));
-                        layouts.Add(vertical);
+                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyFront ? 0 : -k_BalconyConcaveDepth;
                         break;
-                    }
                     case 3:
-                    {
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Left;
-                        var vertical = new VerticalLayout();
-                        vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
-                        {
-                            m_IsShadowWall = true,
-                            m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
-                            m_ShadowWallHeightOffset = 0
-                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
-                        layouts.Add(vertical);
+                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyLeft ? 0 : -k_BalconyConcaveDepth;
                         break;
-                    }
+                    default:
+                        config.faceDirection = config.faceDirection;
+                        break;
                 }
+
+                var vertical = new VerticalLayout();
+                vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
+                {
+                    m_IsShadowWall = true,
+                    m_MoveShadowWallDepth = shadowWallDepth,
+                    m_ShadowWallWidthOffset = shadowWallWidthOffset,
+                    m_ShadowWallHeightOffset = 0
+                }, shadowWidth, config.buildingHeight - k_ShadowWallHeightOffset));
+                vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
+                layouts.Add(vertical);
             }
 
             return layouts;
