@@ -21,7 +21,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         private const float k_WindowFrameRodHeight = 0.05f;
         private const float k_NarrowPanelSize = 2.5f;
         private const float k_MinWallWidthOffset = 1.25f;
-        private const float k_ShadowWallOffset = 0f;
+        private const float k_ShadowWallWidthOffset = 0.3f; // 影壁の幅(窓ガラスを突き抜ける分を抑制)
+        private const float k_ShadowWallHeightOffset = 0f;
         private const float k_EntranceWindowTopOffset = 0.6f;
         private const float k_BalconyConcaveDepth = 0.6f;
         private const float k_BalconyConvexDepth = 1f;
@@ -82,9 +83,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_IsShadowWall = true,
                             m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
+                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
                             m_ShadowWallHeightOffset = 0
-                        }, width + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallOffset));
+                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
                         vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
                         layouts.Add(vertical);
                         break;
@@ -97,9 +98,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_IsShadowWall = true,
                             m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
+                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
                             m_ShadowWallHeightOffset = 0
-                        }, width + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallOffset));
+                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
                         vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
                         layouts.Add(vertical);
                         break;
@@ -112,9 +113,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_IsShadowWall = true,
                             m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
+                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
                             m_ShadowWallHeightOffset = 0
-                        }, width + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallOffset));
+                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
                         vertical.Add(PlanEntranceFacade(panelSizes, floorHeight, remainderWidth, config));
                         layouts.Add(vertical);
                         break;
@@ -127,9 +128,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_IsShadowWall = true,
                             m_MoveShadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth,
-                            m_ShadowWallWidthOffset = (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
+                            m_ShadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count,
                             m_ShadowWallHeightOffset = 0
-                        }, width + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallOffset));
+                        }, width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count, config.buildingHeight - k_ShadowWallHeightOffset));
                         vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
                         layouts.Add(vertical);
                         break;
@@ -165,7 +166,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 {
                     m_IsShadowWall = true,
                     m_MoveShadowWallDepth = 0.8f,
-                    m_ShadowWallWidthOffset = k_ShadowWallOffset,
+                    m_ShadowWallWidthOffset = k_ShadowWallHeightOffset,
                     m_ShadowWallHeightOffset = 0
                 }
             };
@@ -345,11 +346,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             for (int i = from; i < to; i++)
             {
                 float panelWidth = m_SizeValues[panelSizes[i]] + floorWidthOffset;
-                if (config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Back)
-                {
-                    Debug.Log($"direction: {directions}");
-                }
-
                 if (from == to - 1 && panelSizes.Count == 1)
                 {
                     directions |= Directions.Left | Directions.Right;
