@@ -25,7 +25,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         private const float k_EntranceWindowTopOffset = 0.6f;
         private const float k_BalconyConcaveDepth = 0.6f;
         private const float k_BalconyConvexDepth = 1f;
-        private const float k_BalconyWindowDepth = -0.1f;
+        private const float k_BalconyWindowDepth = -0.15f;
 
         private readonly Dictionary<PanelType, List<Func<ILayoutElement>>> m_Constructors = new();
         private readonly Dictionary<PanelSize, float> m_SizeValues = new()
