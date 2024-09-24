@@ -138,6 +138,7 @@ namespace PlateauToolkit.Sandbox.Editor
             // Send a ray downward to get the height of the collider.
             var ray = new Ray(rayStartPosition, Vector3.down);
 
+            var hitPointHeights = new List<float>();
             RaycastHit[] results = Physics.RaycastAll(ray, rayDistance);
             foreach (RaycastHit rayCastHit in results)
             {
@@ -150,9 +151,15 @@ namespace PlateauToolkit.Sandbox.Editor
                     }
 
                     // その他のオブジェクトは配置可能
-                    colliderHeight = rayCastHit.point.y;
-                    return true;
+                    hitPointHeights.Add(rayCastHit.point.y);
                 }
+            }
+
+            if (hitPointHeights.Count > 0)
+            {
+                // 一番上にヒットしたコライダーの高さを取得
+                colliderHeight = hitPointHeights.Max();
+                return true;
             }
 
             // Not found.
