@@ -95,8 +95,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyLeft ? 0 : -k_BalconyConcaveDepth;
                         break;
                     default:
-                        config.faceDirection = config.faceDirection;
-                        break;
+                        return layouts;
                 }
 
                 var vertical = new VerticalLayout();
