@@ -148,10 +148,9 @@ Sandboxアセットは次の8種類に分類されます。
 > カーソルがコライダーの設定されていない場所を指している場合や、指定した場所にオブジェクトを配置すると他のオブジェクトと重なってしまう場合、カーソルは赤色に変わり、クリックしてもオブジェクトを配置することができません。<br>
 > <img width="300" alt="objects_overlapping" src="../Documentation~/Sandbox Images/objects_overlapping.png"><br>
 
-> [!WARNING]
-> v2.0.0-alphaのToolkitでは、建築物Sandboxアセットの表面に他のアセットを配置する機能は提供されていません。この場合、カーソルが赤色に変わり、クリックしてもオブジェクトを配置することができません。<br>
-> PLATEAUの都市モデルの表面にはアセットを配置可能です。<br>
-> <img width="300" alt="asset_cannot_be_placed_to_building" src="../Documentation~/Sandbox Images/asset_cannot_be_placed_to_building.png">
+> [!TIP]
+> 建築物Sandboxアセットのみ、建物の表面に他のアセットを配置することができます。<br>
+> <img width="300" alt="asset_cannot_be_placed_to_building" src="../Documentation~/Sandbox Images/asset_placed_to_building.png">
 
 ## 5-2. 配置オプション
 配置ツールを起動すると、シーンビューの右下に次のような配置ツール設定ウィンドウが表示されます。<br>
