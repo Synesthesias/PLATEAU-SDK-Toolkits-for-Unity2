@@ -331,12 +331,24 @@ CSVファイルに入力された高さ情報はそのままUnity上でのY座�
 
 <img width="1200" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_asset_place.gif">
 
-> [!NOTE]
-> 指定した緯度、経度にコライダーが無いために配置が実行できなかった場合、コンソールログにてwarningが表示されます。
-> <img width="600" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_collider_warning.png">
-
 読み込んでいるシェープファイル、CSVファイルの変更や、属性列の変更を行う場合は `戻る` ボタンより前の画面に戻り、変更を行ってください。
 
+#### 配置の結果
+
+アセットの一括配置が完了すると、ダイアログにて結果が表示されます。また、コンソールログを確認することで詳細を確認できます。
+
+- 全てのアセットの配置に成功<br>
+<img width="300" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_result_all_success.png">
+
+- 一部のアセットの配置に失敗<br>
+<img width="300" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_result_failed.png">
+
+- 全てのアセットの配置に失敗<br>
+<img width="300" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_result_all_failed.png">
+
+> [!TIP]
+> 「地面に配置」を選択している場合、配置する緯度・経度にSandboxアセットや3D都市モデルが存在しても、モデルを無視して地面に配置されます。<br>
+> <img width="400" alt="sandbox_bulk_place" src="../Documentation~/Sandbox Images/bulk_place_ground_place.png">
 
 # 7. トラック機能
 
