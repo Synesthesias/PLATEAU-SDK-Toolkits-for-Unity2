@@ -586,13 +586,16 @@ v2.0.0-alpha時点では以下の5種類の建築物アセットを提供して�
 <img width="400" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/building_settings_apartment.png">
 
 - バルコニーを外壁にせり出す(1m)：バルコニーを壁から1mせり出すことができます。
-  <img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_out_balcony.gif">
+
+<img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_out_balcony.gif">
 
 - 窓ガラスバルコニーに切り替え：バルコニーの見た目を壁から窓ガラスに切り替えることができます。
-  <img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_window_glass.gif">
+
+<img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_window_glass.gif">
 
 - 左側にバルコニーを作成：建物の左側面にバルコニーを追加します。
-  <img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_left_balcony.gif">
+
+<img width="600" alt="building_settings_apartment" src="../Documentation~/Sandbox Images/sandbox_buildings_apartment_left_balcony.gif">
 
 ##### 商業ビル
 個別のパラメータはありません。
