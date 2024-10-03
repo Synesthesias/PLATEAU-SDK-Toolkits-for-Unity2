@@ -149,7 +149,7 @@ Sandboxアセットは次の8種類に分類されます。
 > <img width="300" alt="objects_overlapping" src="../Documentation~/Sandbox Images/objects_overlapping.png"><br>
 
 > [!TIP]
-> 建築物Sandboxアセットのみ、建物の表面に他のアセットを配置することができます。<br>
+> 建築物Sandboxアセットの表面には他のアセットを配置することができます。<br>
 > <img width="300" alt="asset_cannot_be_placed_to_building" src="../Documentation~/Sandbox Images/asset_placed_to_building.png">
 
 ## 5-2. 配置オプション
