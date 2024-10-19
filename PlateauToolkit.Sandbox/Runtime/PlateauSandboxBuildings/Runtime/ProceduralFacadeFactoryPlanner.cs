@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 {
-    [CreateAssetMenu(menuName = "ProceduralToolkit/Buildings/Procedural Facade Planner/Apartment", order = 0)]
-    public class ProceduralFacadeSkyscraperCondominiumPlanner : FacadePlanner
+    [CreateAssetMenu(menuName = "ProceduralToolkit/Buildings/Procedural Facade Planner/Factory", order = 6)]
+    public class ProceduralFacadeFactoryPlanner : FacadePlanner
     {
         private const float k_MaxBuildingHeight = 100f;
         private const float k_MinFloorHeight = 2.75f;
@@ -80,19 +80,19 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 {
                     case 0:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Back;
-                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyBack ? 0 : -k_BalconyConcaveDepth;
+                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyBack ? 0 : -k_BalconyConcaveDepth;
                         break;
                     case 1:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Right;
-                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyRight ? 0 : -k_BalconyConcaveDepth;
+                    //     shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyRight ? 0 : -k_BalconyConcaveDepth;
                         break;
                     case 2:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Front;
-                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyFront ? 0 : -k_BalconyConcaveDepth;
+                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyFront ? 0 : -k_BalconyConcaveDepth;
                         break;
                     case 3:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Left;
-                        shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyLeft ? 0 : -k_BalconyConcaveDepth;
+                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyLeft ? 0 : -k_BalconyConcaveDepth;
                         break;
                     default:
                         return layouts;
@@ -194,7 +194,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     var horizontal = new HorizontalLayout
                     {
                         CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall]),
-                        CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
+                        // CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
                         CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall])
                     };
                     vertical.Add(horizontal);
@@ -217,7 +217,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     var horizontal = new HorizontalLayout
                     {
                         CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall]),
-                        CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
+                        // CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
                         CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall])
                     };
                     vertical.Add(horizontal);

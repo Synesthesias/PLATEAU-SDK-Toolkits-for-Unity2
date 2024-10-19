@@ -59,6 +59,11 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_RoofSideMat = m_Config.hotelMaterialPalette.roofSide;
                         m_UVScale = new Vector2(0.1f, 0.1f);
                         break;
+                    case BuildingType.k_Factory:
+                        m_RoofMat = m_Config.factoryMaterialPalette.roof;
+                        m_RoofSideMat = m_Config.factoryMaterialPalette.roofSide;
+                        m_UVScale = new Vector2(0.1f, 0.1f);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -96,6 +101,11 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_RoofColor = m_Config.hotelVertexColorPalette.roofColor;
                         m_RoofSideColor = m_Config.hotelVertexColorPalette.roofSideColor;
                         m_VertexRoofMat = m_Config.hotelVertexColorMaterialPalette.vertexRoof;
+                        break;
+                    case BuildingType.k_Factory:
+                        m_RoofColor = m_Config.factoryVertexColorPalette.roofColor;
+                        m_RoofSideColor = m_Config.factoryVertexColorPalette.roofSideColor;
+                        m_VertexRoofMat = m_Config.factoryVertexColorMaterialPalette.vertexRoof;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

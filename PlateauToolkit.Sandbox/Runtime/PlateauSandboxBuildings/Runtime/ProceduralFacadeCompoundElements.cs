@@ -131,6 +131,24 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             };
                         }
                         break;
+                    case BuildingType.k_Factory:
+                        if (UseTexture)
+                        {
+                            m_WallTexturedData = new WallTexturedData
+                            {
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.factoryMaterialPalette.wall
+                            };
+                        }
+                        else
+                        {
+                            m_WallColorData = new WallColorData
+                            {
+                                m_WallColor = config.factoryVertexColorPalette.wallColor,
+                                m_VertexColorWallMat = config.factoryVertexColorMaterialPalette.vertexWall
+                            };
+                        }
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -414,6 +432,30 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                 m_WallMat = config.hotelMaterialPalette.wall,
                                 m_WindowPaneMat = config.hotelMaterialPalette.windowPane,
                                 m_WindowGlassMat = config.hotelMaterialPalette.windowGlass,
+                            };
+                        }
+                        else
+                        {
+                            m_WindowColorData = new WindowColorData
+                            {
+                                m_WallColor = config.hotelVertexColorPalette.wallColor,
+                                m_VertexWallMat = config.hotelVertexColorMaterialPalette.vertexWall,
+                                m_WindowPaneColor = config.hotelVertexColorPalette.windowPaneColor,
+                                m_WindowPaneGlassColor = config.hotelVertexColorPalette.windowPaneGlassColor,
+                                m_VertexWindowPaneMat = config.hotelVertexColorMaterialPalette.vertexWindowPane,
+                            };
+                        }
+                        break;
+                    case BuildingType.k_Factory:
+                        if (UseTexture)
+                        {
+                            m_WindowTexturedData = new WindowTexturedData
+                            {
+                                m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.factoryMaterialPalette.wall,
+                                m_WindowPaneMat = config.factoryMaterialPalette.windowFrame,
+                                m_WindowGlassMat = config.factoryMaterialPalette.windowGlass,
                             };
                         }
                         else
