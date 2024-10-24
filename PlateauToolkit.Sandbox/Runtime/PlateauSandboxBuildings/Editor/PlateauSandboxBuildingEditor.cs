@@ -425,9 +425,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                     EditorGUILayout.LabelField("ホテル設定", EditorStyles.boldLabel);
                     return DrawDynamicPropertyOnly(m_HotelParams);
                 case (int)BuildingType.k_Factory:
-                    // EditorGUILayout.LabelField("工場設定", EditorStyles.boldLabel);
-                    // return DrawDynamicPropertyOnly(m_FactoryParams);
-                    return false;
+                    EditorGUILayout.LabelField("工場設定", EditorStyles.boldLabel);
+                    return DrawDynamicPropertyOnly(m_FactoryParams);
             }
             return false;
         }

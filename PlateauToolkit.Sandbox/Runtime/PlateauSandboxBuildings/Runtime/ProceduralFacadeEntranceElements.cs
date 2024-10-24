@@ -15,6 +15,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             public Color m_EntranceDoorFrameColor;
             public Color m_EntranceRoofColor;
             public Material m_VertexWallMaterial;
+            public float m_EntranceTopOffset = 0;
         }
 
         protected class EntranceTexturedData
@@ -25,6 +26,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             public Material m_EntranceDoorMat;
             public Material m_EntranceDoorFrameMat;
             public Material m_EntranceDoorRoofMat;
+            public float m_EntranceTopOffset = 0;
         }
 
         protected static MeshDraft Entrance(
@@ -65,32 +67,61 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             EntranceTexturedData entranceTexturedData
             )
         {
-            Vector3 widthVector = Vector3.right*width;
-            Vector3 heightVector = Vector3.up*height;
+            Vector3 widthVector = Vector3.right * width;
+            Vector3 heightVector = Vector3.up * height;
 
-            Vector3 doorWidth = Vector3.right*k_EntranceDoorWidth;
-            Vector3 doorHeight = Vector3.up*k_EntranceDoorHeight;
-            Vector3 doorThickness = Vector3.back*k_EntranceDoorThickness;
-            Vector3 doorOrigin = origin + widthVector/2 - doorWidth/2;
+            Vector3 doorWidth = widthVector;
+            Vector3 doorFrameWidth = Vector3.right * (k_EntranceDoorWidth * 0.02f);
+            Vector3 doorHeight = heightVector - Vector3.up * entranceTexturedData.m_EntranceTopOffset;
+            Vector3 doorFrameHeight = Vector3.up * (k_EntranceDoorHeight * 0.02f);
+            Vector3 doorThickness = Vector3.back * k_EntranceDoorThickness;
+            Vector3 doorOrigin = origin + widthVector / 2 - doorWidth / 2;
 
             var meshDraft = new CompoundMeshDraft();
+            MeshDraft bracket = EntranceBracketTextured(origin, widthVector, heightVector, doorOrigin, doorWidth, doorHeight, entranceTexturedData.m_UVScale)
+                .Paint(entranceTexturedData.m_WallMat);
+            bracket.name = k_WallTexturedDraftName;
+            meshDraft.Add(bracket);
 
-            MeshDraft draft = EntranceBracketTextured(origin, widthVector, heightVector, doorOrigin, doorWidth, doorHeight, entranceTexturedData.m_UVScale)
+            MeshDraft doorLeftFrame = MeshDraft.PartialBox(doorFrameWidth, -doorThickness / 2, doorHeight, Directions.Back | Directions.Right, generateUV: true)
+                .Move(doorOrigin + doorFrameWidth / 2 + doorHeight / 2 - doorThickness / 4)
+                .Paint(entranceTexturedData.m_EntranceDoorFrameMat);
+            doorLeftFrame.name = k_EntranceDoorFrameTexturedDraftName;
+            meshDraft.Add(doorLeftFrame);
+
+            MeshDraft doorRightFrame = MeshDraft.PartialBox(doorFrameWidth, -doorThickness / 2, doorHeight, Directions.Back | Directions.Left, generateUV: true)
+                .Move(doorOrigin + doorWidth - doorFrameWidth / 2 + doorHeight / 2 - doorThickness / 4)
+                .Paint(entranceTexturedData.m_EntranceDoorFrameMat);
+            doorRightFrame.name = k_EntranceDoorFrameTexturedDraftName;
+            meshDraft.Add(doorRightFrame);
+
+            MeshDraft doorUpperFrame = MeshDraft.PartialBox(doorWidth - doorFrameWidth * 2, -doorThickness / 2, doorFrameHeight, Directions.Back | Directions.Down, generateUV: true)
+                .Move(doorOrigin + doorWidth / 2 + doorHeight - doorFrameHeight / 2 - doorThickness / 4)
+                .Paint(entranceTexturedData.m_EntranceDoorFrameMat);
+            doorUpperFrame.name = k_EntranceDoorFrameTexturedDraftName;
+            meshDraft.Add(doorUpperFrame);
+
+            MeshDraft doorBottomFrame = MeshDraft.PartialBox(doorWidth - doorFrameWidth * 2, -doorThickness / 2, doorFrameHeight, Directions.Back | Directions.Up, generateUV: true)
+                .Move(doorOrigin + doorWidth /2 + doorFrameHeight / 2 - doorThickness / 4)
+                .Paint(entranceTexturedData.m_EntranceDoorFrameMat);
+            doorBottomFrame.name = k_EntranceDoorFrameTexturedDraftName;
+            meshDraft.Add(doorBottomFrame);
+
+            MeshDraft door = new MeshDraft().AddQuad(doorOrigin, doorWidth, doorHeight, entranceTexturedData.m_UVScale, calculateNormal: true, generateUV: true)
+                .Move( - doorThickness / 2)
                 .Paint(entranceTexturedData.m_EntranceDoorMat);
-            draft.name = k_EntranceDoorTexturedDraftName;
-            meshDraft.Add(draft);
+            door.name = k_EntranceDoorTexturedDraftName;
+            meshDraft.Add(door);
 
-            // MeshDraft doorFrame = MeshDraft.PartialBox(doorWidth, -doorThickness, doorHeight, Directions.All & ~Directions.ZAxis, generateUV:true)
-            //     .Move(doorOrigin + doorWidth/2 + doorHeight/2 + doorThickness/2)
-            //     .Paint(entranceTexturedData.m_EntranceDoorColor, entranceTexturedData.m_VertexWallMat);
-            // doorFrame.name = k_EntranceDoorDraftName;
-            // meshDraft.Add(doorFrame);
-            //
-            // MeshDraft door = new MeshDraft()
-            //     .AddQuad(doorOrigin + doorThickness, doorWidth, doorHeight, entranceTexturedData.m_UVScale, calculateNormal:true, generateUV:true)
-            //     .Paint(entranceTexturedData.m_EntranceDoorColor, entranceTexturedData.m_VertexWallMat);
-            // door.name = k_EntranceDoorDraftName;
-            // meshDraft.Add(door);
+            if (entranceTexturedData.m_HasRoof)
+            {
+                Vector3 depthVector = Vector3.forward*k_EntranceDoorRoofDepth;
+                MeshDraft roof = MeshDraft.PartialBox(doorWidth*1.2f, depthVector, Vector3.up*k_EntranceDoorRoofHeight, Directions.All & ~Directions.Forward, generateUV: true)
+                    .Move(origin + widthVector/2 + doorHeight + doorFrameHeight + Vector3.up*(k_EntranceDoorRoofHeight/2) - depthVector/2)
+                    .Paint(entranceTexturedData.m_EntranceDoorRoofMat);
+                door.name = k_EntranceDoorRoofTexturedDraftName;
+                meshDraft.Add(roof);
+            }
 
             return meshDraft;
         }

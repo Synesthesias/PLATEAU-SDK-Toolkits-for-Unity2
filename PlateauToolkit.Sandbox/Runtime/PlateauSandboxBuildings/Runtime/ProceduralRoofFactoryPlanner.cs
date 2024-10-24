@@ -11,7 +11,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
     {
         public override IConstructible<CompoundMeshDraft> Plan(List<Vector2> foundationPolygon, BuildingGenerator.Config config)
         {
-            return new ProceduralHippedRoof(foundationPolygon, config)
+            return new ProceduralFlatRoof(foundationPolygon, config)
             {
                 m_Thickness = 0.05f,
                 m_Overhang = 0

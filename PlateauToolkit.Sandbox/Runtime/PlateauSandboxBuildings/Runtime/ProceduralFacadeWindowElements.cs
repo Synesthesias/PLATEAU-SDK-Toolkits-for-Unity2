@@ -14,6 +14,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             public Color m_WindowPaneGlassColor;
             public Material m_VertexWallMat;
             public Material m_VertexWindowPaneMat;
+            public float m_RectangleWindowOffsetScale = 0.2f;
         }
 
         public class WindowTexturedData
@@ -23,6 +24,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             public Material m_WallMat;
             public Material m_WindowGlassMat;
             public Material m_WindowPaneMat;
+            public float m_RectangleWindowOffsetScale = 0.2f;
         }
 
         protected static CompoundMeshDraft Window(
@@ -59,12 +61,12 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 float heightOffset;
                 if (width < height)
                 {
-                    widthOffset = width * 0.2f;
+                    widthOffset = width * windowColorData.m_RectangleWindowOffsetScale;
                     heightOffset = (height - width) * 0.5f + widthOffset;
                 }
                 else
                 {
-                    heightOffset = height * 0.2f;
+                    heightOffset = height * windowColorData.m_RectangleWindowOffsetScale;
                     widthOffset = (width - height) * 0.5f + heightOffset;
                 }
 
@@ -137,12 +139,12 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 float heightOffset;
                 if (width < height)
                 {
-                    widthOffset = width * 0.2f;
+                    widthOffset = width * windowTexturedData.m_RectangleWindowOffsetScale;
                     heightOffset = (height - width) * 0.5f + widthOffset;
                 }
                 else
                 {
-                    heightOffset = height * 0.2f;
+                    heightOffset = height * windowTexturedData.m_RectangleWindowOffsetScale;
                     widthOffset = (width - height) * 0.5f + heightOffset;
                 }
 
