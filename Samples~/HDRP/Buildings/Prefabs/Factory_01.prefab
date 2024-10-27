@@ -169,7 +169,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 644c1a7b4fd9ad34ba7646aede2aaf68, type: 2}
-  - {fileID: 2100000, guid: 5459583a0f83fe541ad8d58e4aec085d, type: 2}
+  - {fileID: 2100000, guid: 77a58d7aac420114e994f8e85a5f6395, type: 2}
   - {fileID: 2100000, guid: 9bfa7a47cac055d4e8f10deac5b552d2, type: 2}
   - {fileID: 2100000, guid: c44f543525914eb4985072a1e3cbe8a7, type: 2}
   - {fileID: 2100000, guid: 6a95457485795ae4fa71112d061885ca, type: 2}
@@ -434,9 +434,9 @@ MonoBehaviour:
     socleColor: {r: 1, g: 1, b: 1, a: 1}
     socleTopColor: {r: 0, g: 0, b: 0, a: 1}
     wallColor: {r: 1, g: 1, b: 1, a: 1}
-    entranceShutter: {r: 0.4415095, g: 0.4415095, b: 0.4415095, a: 0}
-    entranceShutterFrame: {r: 0, g: 0, b: 0, a: 0}
-    entranceShutterRoof: {r: 0.7433963, g: 0.7433963, b: 0.7433963, a: 0}
+    entranceShutter: {r: 0.4415095, g: 0.4415095, b: 0.4415095, a: 1}
+    entranceShutterFrame: {r: 0, g: 0, b: 0, a: 1}
+    entranceShutterRoof: {r: 0.7433963, g: 0.7433963, b: 0.7433963, a: 1}
     windowFrameColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     windowGlassColor: {r: 1, g: 1, b: 1, a: 1}
     roofColor: {r: 0.1254902, g: 0.1254902, b: 0.1254902, a: 1}
@@ -449,7 +449,7 @@ MonoBehaviour:
     socle: {fileID: 2100000, guid: c44f543525914eb4985072a1e3cbe8a7, type: 2}
     socleTop: {fileID: 2100000, guid: 6a95457485795ae4fa71112d061885ca, type: 2}
     wall: {fileID: 2100000, guid: 0e5639004f557ce4599fc42f71832e77, type: 2}
-    entranceShutter: {fileID: 2100000, guid: 5459583a0f83fe541ad8d58e4aec085d, type: 2}
+    entranceShutter: {fileID: 2100000, guid: 77a58d7aac420114e994f8e85a5f6395, type: 2}
     entranceShutterFrame: {fileID: 2100000, guid: 644c1a7b4fd9ad34ba7646aede2aaf68, type: 2}
     entranceShutterRoof: {fileID: 2100000, guid: 9bfa7a47cac055d4e8f10deac5b552d2, type: 2}
     windowFrame: {fileID: 2100000, guid: b8a6a8db63fd6a24e95f0a608435ab55, type: 2}
