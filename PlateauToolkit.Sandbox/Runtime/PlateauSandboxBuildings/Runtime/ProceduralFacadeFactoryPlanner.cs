@@ -1,4 +1,3 @@
-using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib;
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings;
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Interfaces;
 using ProceduralToolkit;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 {
@@ -15,24 +13,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
     public class ProceduralFacadeFactoryPlanner : FacadePlanner
     {
         private const float k_MaxBuildingHeight = 100f;
-        private const float k_MinFloorHeight = 2.75f;
-        private const float k_MaxFloorHeight = 3.25f;
+        private const float k_MinBuildingHeight = 5f;
         private const float k_BufferWidth = 2;
         private const float k_SocleHeight = 0.3f;
         private const float k_SocleTopHeight = 0.05f;
         private const string k_SocleTopTexturedDraftName = "SocleTopTextured";
-        private const float k_WindowBottomOffset = 1.5f;
-        private const float k_WindowTopOffset = 0.8f;
-        private const float k_WindowFrameRodHeight = 0.05f;
         private const float k_NarrowPanelSize = 2.5f;
         private const float k_MinWallWidthOffset = 1.25f;
-        private const float k_ShadowWallWidthOffset = 0.3f; // 影壁の幅(窓ガラスを突き抜ける分を抑制)
         private const float k_ShadowWallHeightOffset = 0f;
-        private const float k_BalconyConcaveDepth = 0.6f;
-        private const float k_BalconyConvexDepth = 1f;
-        private const float k_BalconyWindowDepth = -0.15f;
-        private const float k_EntranceWindowHeight = 2.5f;
         private const float k_EntranceTopOffset = 1.0f;
+        private const float k_WindowTopOffset = 0.8f;
+        private const float k_WindowBottomOffset = 0.8f;
 
         private readonly Dictionary<PanelType, List<Func<ILayoutElement>>> m_Constructors = new();
         private readonly Dictionary<PanelSize, float> m_SizeValues = new()
@@ -61,64 +52,30 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 bool leftIsConvex = Geometry.GetAngle(b, a, aNext) <= 180;
                 bool rightIsConvex = Geometry.GetAngle(bPrevious, b, a) <= 180;
                 List<PanelSize> panelSizes = DivideFacade(width, leftIsConvex, rightIsConvex, out float remainderWidth);
-                float wallWidthOffset = Mathf.Max(k_MinWallWidthOffset, remainderWidth);
-                float wallAveWidthOffset = wallWidthOffset / panelSizes.Count;
-                float floorWidthOffset = remainderWidth / panelSizes.Count;
-                float shadowWallDepth = (config.skyscraperCondominiumParams.convexBalcony ? k_BalconyConvexDepth : k_BalconyConcaveDepth) - k_BalconyWindowDepth;
-                float shadowWallWidthOffset = k_ShadowWallWidthOffset + (-floorWidthOffset + wallAveWidthOffset) * panelSizes.Count;
-                float shadowWidth = width - k_ShadowWallWidthOffset + (floorWidthOffset - wallAveWidthOffset) * panelSizes.Count;
-
-                // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める
-                float floorHeight = 0;
-                float floorHeightRemaining = 1f;
-                for (float tempFloorHeight = k_MinFloorHeight; tempFloorHeight < k_MaxFloorHeight;)
-                {
-                    float numFloor = config.buildingHeight / tempFloorHeight;
-                    if (numFloor - Mathf.Floor(numFloor) < floorHeightRemaining)
-                    {
-                        floorHeight = tempFloorHeight;
-                        floorHeightRemaining = numFloor - Mathf.Floor(numFloor);
-                    }
-                    tempFloorHeight += 0.05f;
-                }
 
                 var vertical = new VerticalLayout();
                 switch (i)
                 {
                     case 0:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Back;
-                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyBack ? 0 : -k_BalconyConcaveDepth;
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
+                        vertical.Add(PlanNormalFacade(panelSizes, remainderWidth, config));
                         break;
                     case 1:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Right;
-                    //     shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyRight ? 0 : -k_BalconyConcaveDepth;
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
+                        vertical.Add(PlanNormalFacade(panelSizes, remainderWidth, config));
                         break;
                     case 2:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Front;
-                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyFront ? 0 : -k_BalconyConcaveDepth;
-                        vertical.Add(PlanEntranceFacade(panelSizes, floorHeight, remainderWidth, config));
+                        vertical.Add(PlanEntranceFacade(panelSizes, remainderWidth, config));
                         break;
                     case 3:
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Left;
-                        // shadowWallDepth += config.skyscraperCondominiumParams.hasBalconyLeft ? 0 : -k_BalconyConcaveDepth;
-                        vertical.Add(PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
+                        vertical.Add(PlanNormalFacade(panelSizes, remainderWidth, config));
                         break;
                     default:
                         return layouts;
                 }
 
-                // vertical.AddElement(Construct(() => new ProceduralFacadeCompoundElements.ProceduralWall(config)
-                // {
-                //     m_IsShadowWall = true,
-                //     m_MoveShadowWallDepth = shadowWallDepth,
-                //     m_ShadowWallWidthOffset = shadowWallWidthOffset,
-                //     m_ShadowWallHeightOffset = 0
-                // }, shadowWidth, config.buildingHeight - k_ShadowWallHeightOffset));
-                // vertical.Add(config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Front
-                //     ? PlanEntranceFacade(panelSizes, floorHeight, remainderWidth, config)
-                //     : PlanNormalFacade(panelSizes, floorHeight, remainderWidth, config));
                 layouts.Add(vertical);
             }
 
@@ -169,7 +126,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     m_NumCenterRods = 0,
                     m_HasWindowsill = false,
                     m_RectangleWindow = true,
-                    m_RectangleWindowOffsetScale = 0.33f
+                    m_RectangleWindowOffsetScale = 0.33f,
+                    m_WindowTopOffset = k_WindowTopOffset,
+                    m_WindowBottomOffset = -k_WindowBottomOffset
                 }
             };
             m_Constructors[PanelType.k_WallOrWindow] = new List<Func<ILayoutElement>>
@@ -179,65 +138,54 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             };
         }
 
-        private ILayout PlanNormalFacade(List<PanelSize> panelSizes, float floorHeight, float remainderWidth, BuildingGenerator.Config config)
+        private ILayout PlanNormalFacade(List<PanelSize> panelSizes, float remainderWidth, BuildingGenerator.Config config)
         {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
             float floorWidthOffset = remainderWidth / panelSizes.Count;
             var vertical = new VerticalLayout
             {
                 CreateHorizontal(panelSizes, 0, panelSizes.Count, k_SocleHeight, floorWidthOffset, m_Constructors[PanelType.k_Socle]),
                 CreateHorizontal(panelSizes, 0, panelSizes.Count, k_SocleTopHeight, floorWidthOffset, m_Constructors[PanelType.k_SocleTop]),
-                CreateHorizontalWindow(panelSizes, 0, panelSizes.Count, entranceHeight - k_SocleHeight - k_SocleTopHeight, floorWidthOffset)
+                CreateHorizontalWindow(panelSizes, 0, panelSizes.Count, k_MinBuildingHeight - k_SocleHeight - k_SocleTopHeight, floorWidthOffset)
             };
 
             // エントランスを除いた階数分の壁を生成
-            float remainingHeight = config.buildingHeight - entranceHeight;
+            float remainingHeight = config.buildingHeight - k_MinBuildingHeight;
             if (0 < remainingHeight)
             {
-                vertical.Add(CreateNormalFacadeVertical(panelSizes, floorHeight, remainderWidth, 0, panelSizes.Count, config));
+                vertical.Add(CreateNormalFacadeVertical(panelSizes, remainingHeight, remainderWidth, 0, panelSizes.Count));
             }
 
             return vertical;
         }
 
-        private VerticalLayout CreateNormalFacadeVertical(List<PanelSize> panelSizes, float floorHeight, float remainderWidth, int from, int to, BuildingGenerator.Config config)
+        private VerticalLayout CreateNormalFacadeVertical(List<PanelSize> panelSizes, float floorHeight, float remainderWidth, int from, int to)
         {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
             float floorWidthOffset = remainderWidth / (to - from);
-            var vertical = new VerticalLayout();
-            for (int i = 0; i < numFloorWithoutEntrance; i++)
-            {
-                vertical.Add(CreateHorizontal(panelSizes, from, to, floorHeight, floorWidthOffset, m_Constructors[PanelType.k_Wall]));
-            }
-
+            var vertical = new VerticalLayout { CreateHorizontal(panelSizes, from, to, floorHeight, floorWidthOffset, m_Constructors[PanelType.k_Wall]) };
             return vertical;
         }
 
-        private ILayout PlanEntranceFacade(List<PanelSize> panelSizes, float floorHeight, float remainderWidth, BuildingGenerator.Config config)
+        private ILayout PlanEntranceFacade(List<PanelSize> panelSizes, float remainderWidth, BuildingGenerator.Config config)
         {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
             float wallWidthOffset = Mathf.Max(k_MinWallWidthOffset, remainderWidth);
             float wallAveWidthOffset = wallWidthOffset / panelSizes.Count;
             float floorWidthOffset = remainderWidth / panelSizes.Count;
 
             // 1階部分
             var vertical = new VerticalLayout();
-            float remainingHeight = config.buildingHeight - entranceHeight;
-            float entranceTopOffset = 0 < remainingHeight ? 0 : k_EntranceTopOffset;
+            float remainingHeight = config.buildingHeight - k_MinBuildingHeight;
             var horizontal = new HorizontalLayout
             {
-                Construct(m_Constructors[PanelType.k_Wall], wallWidthOffset * 0.5f, entranceHeight),
-                CreateHorizontalEntrance(panelSizes, 0, panelSizes.Count, entranceHeight, floorWidthOffset - wallAveWidthOffset, entranceTopOffset, config),
-                Construct(m_Constructors[PanelType.k_Wall], wallWidthOffset * 0.5f, entranceHeight)
+                Construct(m_Constructors[PanelType.k_Wall], wallWidthOffset * 0.5f, k_MinBuildingHeight),
+                CreateHorizontalEntrance(panelSizes.Count, k_MinBuildingHeight, floorWidthOffset - wallAveWidthOffset, k_EntranceTopOffset, config),
+                Construct(m_Constructors[PanelType.k_Wall], wallWidthOffset * 0.5f, k_MinBuildingHeight)
             };
             vertical.Add(horizontal);
 
             // 2階以降は壁を生成
             if (0 < remainingHeight)
             {
-                vertical.Add(CreateNormalFacadeVertical(panelSizes, floorHeight, remainderWidth, 0, panelSizes.Count, config));
+                vertical.Add(CreateNormalFacadeVertical(panelSizes, remainingHeight, remainderWidth, 0, panelSizes.Count));
             }
 
             return vertical;
@@ -309,73 +257,77 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             return horizontal;
         }
 
-        private HorizontalLayout CreateHorizontalEntrance(List<PanelSize> panelSizes, int from, int to, float height, float floorWidthOffset, float entranceTopOffset, BuildingGenerator.Config config)
+        private HorizontalLayout CreateHorizontalEntrance(int panelCount, float height, float floorWidthOffset, float entranceTopOffset, BuildingGenerator.Config config)
         {
             var horizontal = new HorizontalLayout();
-            // Debug.Log($"{from} - {to}");
-            int[] array = new int[to];
-            int onesCount = to / 3;
+            int[] array = new int[panelCount];
+            int onesCount = panelCount / 3;
             int i = 0;
             int oneCount = 0;
+            float panelWidth = k_NarrowPanelSize + floorWidthOffset;
+            float sumPanelWidth = 0;
+
             while (onesCount > 0)
             {
-                // 1を2回連続で配置
+                // シャッターサイズを２倍にして配置
                 array[i] = 1;
                 array[i + 1] = 1;
                 onesCount -= 1;
                 oneCount += 1;
+                sumPanelWidth += panelWidth * 2;
 
                 // 次の配置位置までスキップ（1つは0を挟む）
                 i += 3;
             }
 
-            if (i + 1 <= to)
+            if (i + 1 <= panelCount)
             {
+                // 通常サイズのシャッターサイズを配置
                 array[i] = 1;
                 oneCount += 1;
+                sumPanelWidth += panelWidth;
             }
+
+            // 壁の数をカウント
+            int wallCount = array.Take(array.Length - 1).Count(element => element == 0);
+
+            // シャッターが２つ以上ある場合はシャッター間の壁幅を半分にする
+            // シャッターすべてのサイズを平均化
+            float avePanelWidth = (sumPanelWidth + wallCount * panelWidth * 0.5f) / oneCount;
 
             // 最後の壁は追加せず、そのスペースをエントランスに振り分ける。
             float panelWidthOffset = 0;
-            if (array[to - 1] == 0)
+            if (array[panelCount - 1] == 0)
             {
-                panelWidthOffset = m_SizeValues[panelSizes[to - 1]] + floorWidthOffset;
-                panelWidthOffset /= oneCount;
+                panelWidthOffset = panelWidth / oneCount;
             }
 
-            for (int j = 0; j < to;)
+            // シャッターを配置
+            for (int j = 0; j < panelCount;)
             {
-                float panelWidth = m_SizeValues[panelSizes[j]] + floorWidthOffset ;
-                if (j + 1 < to && array[j] == 1 && array[j + 1] == 1)
+                if (j + 1 < panelCount && array[j] == 1 && array[j + 1] == 1)
                 {
-                    // Debug.Log($"{array[j]}");
-                    // Debug.Log($"{array[j + 1]}");
                     horizontal.Add(Construct(() => new ProceduralFacadeCompoundElements.ProceduralEntrance(config)
                     {
                         m_EntranceTopOffset = entranceTopOffset
-                    }, panelWidth * 2 + panelWidthOffset, height));
-                    // horizontal.Add(Construct(m_Constructors[PanelType.k_Entrance][0], panelWidth * 2 + panelWidthOffset, height));
+                    }, avePanelWidth + panelWidthOffset, height));
                     j += 2;
                 }
                 else if (array[j] == 1)
                 {
-                    // Debug.Log($"{array[j]}");
                     horizontal.Add(Construct(() => new ProceduralFacadeCompoundElements.ProceduralEntrance(config)
                     {
                         m_EntranceTopOffset = entranceTopOffset
-                    }, panelWidth + panelWidthOffset, height));
-                    // horizontal.Add(Construct(m_Constructors[PanelType.k_Entrance][0], panelWidth + panelWidthOffset, height));
+                    }, avePanelWidth + panelWidthOffset, height));
                     j++;
                 }
-                else if (array[j] == 0 && j != to - 1)
+                else if (array[j] == 0 && j != panelCount - 1)
                 {
-                    // Debug.Log($"{array[j]}");
-                    horizontal.Add(Construct(m_Constructors[PanelType.k_Wall][0], panelWidth, height));
+                    horizontal.Add(Construct(m_Constructors[PanelType.k_Wall][0], panelWidth * 0.5f, height));
                     j++;
                 }
                 else
                 {
-                    // Debug.Log($"{array[j]}");
                     j++;
                 }
             }

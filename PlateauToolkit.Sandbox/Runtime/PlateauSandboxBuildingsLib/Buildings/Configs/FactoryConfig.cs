@@ -9,9 +9,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         [Serializable]
         public class Params
         {
-            [CustomLabel("Test")]
-            public bool socleThickness;
-            [CustomLabel("エントランスに庇を追加")]
+            [CustomLabel("シャッターに庇を追加")]
             public bool hasEntranceRoof;
         }
 

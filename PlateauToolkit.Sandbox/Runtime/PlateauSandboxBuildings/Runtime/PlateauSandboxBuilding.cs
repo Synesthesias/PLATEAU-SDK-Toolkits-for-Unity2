@@ -81,6 +81,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 BuildingType.k_ConvenienceStore => "ConvenienceStore",
                 BuildingType.k_CommercialBuilding => "CommercialBuilding",
                 BuildingType.k_Hotel => "Hotel",
+                BuildingType.k_Factory => "Factory",
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

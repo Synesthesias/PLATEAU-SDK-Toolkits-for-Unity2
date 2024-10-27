@@ -753,40 +753,24 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
             public override CompoundMeshDraft Construct(Vector2 parentLayoutOrigin)
             {
-                if (BuildingType.k_House == m_BuildingType)
+                switch (m_BuildingType)
                 {
-                    return UseTexture
-                        ? ResidenceEntranceTextured(parentLayoutOrigin + origin, width, height, m_EntranceTexturedData)
-                        : new CompoundMeshDraft().Add(ResidenceEntrance(parentLayoutOrigin + origin, width, height, m_EntranceColorData));
+                    case BuildingType.k_House:
+                        return UseTexture
+                            ? ResidenceEntranceTextured(parentLayoutOrigin + origin, width, height, m_EntranceTexturedData)
+                            : new CompoundMeshDraft().Add(ResidenceEntrance(parentLayoutOrigin + origin, width, height, m_EntranceColorData));
+                    case BuildingType.k_Factory:
+                        if (UseTexture)
+                        {
+                            m_EntranceTexturedData.m_EntranceTopOffset = m_EntranceTopOffset;
+                            return FactoryEntranceTextured(parentLayoutOrigin + origin, width, height, m_EntranceTexturedData);
+                        }
+
+                        m_EntranceColorData.m_EntranceTopOffset = m_EntranceTopOffset;
+                        return new CompoundMeshDraft().Add(FactoryEntrance(parentLayoutOrigin + origin, width, height, m_EntranceColorData));
+                    default:
+                        return new CompoundMeshDraft();
                 }
-
-                if (UseTexture)
-                {
-                    m_EntranceTexturedData.m_EntranceTopOffset = m_EntranceTopOffset;
-                    return EntranceTextured(parentLayoutOrigin + origin, width, height, m_EntranceTexturedData);
-                }
-
-                m_EntranceColorData.m_EntranceTopOffset = m_EntranceTopOffset;
-                return new CompoundMeshDraft().Add(Entrance(parentLayoutOrigin + origin, width, height, m_EntranceColorData));
-            }
-        }
-
-        public class ProceduralEntranceWindow : ProceduralFacadeEntranceElement
-        {
-            private Color wallColor;
-            private Color frameColor;
-            private Color glassColor;
-
-            public ProceduralEntranceWindow(Color wallColor, Color frameColor, Color glassColor)
-            {
-                this.wallColor = wallColor;
-                this.frameColor = frameColor;
-                this.glassColor = glassColor;
-            }
-
-            public override CompoundMeshDraft Construct(Vector2 parentLayoutOrigin)
-            {
-                return EntranceWindow(parentLayoutOrigin + origin, width, height, wallColor, frameColor, glassColor);
             }
         }
 

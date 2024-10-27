@@ -70,8 +70,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     widthOffset = (width - height) * 0.5f + heightOffset;
                 }
 
-                frameMin = min + Vector3.right * widthOffset + Vector3.up * heightOffset;
-                frameMax = max - Vector3.right * widthOffset - Vector3.up * heightOffset;
+                frameMin = min + Vector3.right * widthOffset + Vector3.up * heightOffset + Vector3.up * windowBottomOffset;
+                frameMax = max - Vector3.right * widthOffset - Vector3.up * heightOffset - Vector3.up * windowTopOffset;
                 frameWidth = Vector3.right * (width - widthOffset * 2);
                 frameHeight = Vector3.up * (height - heightOffset * 2);
                 frameSize = frameMax - frameMin;
@@ -148,8 +148,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     widthOffset = (width - height) * 0.5f + heightOffset;
                 }
 
-                frameMin = min + Vector3.right * widthOffset + Vector3.up * heightOffset;
-                frameMax = max - Vector3.right * widthOffset - Vector3.up * heightOffset;
+                frameMin = min + Vector3.right * widthOffset + Vector3.up * heightOffset + Vector3.up * windowBottomOffset;
+                frameMax = max - Vector3.right * widthOffset - Vector3.up * heightOffset - Vector3.up * windowTopOffset;
                 frameWidth = Vector3.right * (width - widthOffset * 2);
                 frameHeight = Vector3.up * (height - heightOffset * 2);
                 frameSize = frameMax - frameMin;
