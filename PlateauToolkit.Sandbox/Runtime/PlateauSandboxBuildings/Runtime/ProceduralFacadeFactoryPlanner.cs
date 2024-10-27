@@ -101,10 +101,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     socleMat: config.factoryMaterialPalette.socleTop
                 )
             };
-            m_Constructors[PanelType.k_Entrance] = new List<Func<ILayoutElement>>
-            {
-                () => new ProceduralFacadeCompoundElements.ProceduralEntrance(config),
-            };
             m_Constructors[PanelType.k_Wall] = new List<Func<ILayoutElement>>
             {
                 () => new ProceduralFacadeCompoundElements.ProceduralWall(config)
@@ -357,7 +353,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         {
             k_Socle,
             k_SocleTop,
-            k_Entrance,
             k_Wall,
             k_ShadowWall,
             k_Window,
