@@ -92,8 +92,12 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
                 if (rb is RnDataRoad)
                 {
                     RnDataRoad road = (RnDataRoad)rb;
+                    // 空の道路は無視
+                    if (road.IsEmptyRoad(getter))
+                        continue;
 
                     List<RnDataLane> lanes = road.GetMainLanes(getter);
+
 
                     foreach (var lane in lanes)
                     {
@@ -102,12 +106,12 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
                         //ポイント数が足りない場合は、暫定的にポイントを作成
                         if (points.Count == 0)
                         {
-                            Debug.Log($"points not found");
+                            Debug.Log($"points not found {road?.TargetTran?.gameObject?.name ?? "null"}");
                             points = new() { Vector3.zero, Vector3.zero };
                         }
                         else if (points.Count == 1)
                         {
-                            Debug.Log($"points size are 1");
+                            Debug.Log($"points size are 1 {road?.TargetTran?.gameObject?.name ?? "null"}");
                             points.Add(points.FirstOrDefault());
                         }
                         //points = ConvertToSplinePoints(points);
@@ -173,9 +177,43 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
                         info.trafficLane = trafficLane;
                         info.track = track;
 
-                        info.nextLanes = intersection.GetNextLanesFromTrack(getter, track);
+                        var nextRoad = intersection
+                            .GetEdgesFromBorder(getter, track.GetToBorder(getter))
+                            .FirstOrDefault()?.GetRoad(getter) as RnDataRoad;
 
-                        info.prevLanes = intersection.GetPrevLanesFromTrack(getter, track);
+                        if (nextRoad?.IsEmptyRoad(getter) ?? false)
+                        {
+                            var nextIntersection = nextRoad.GetNeighborRoads(getter)
+                                .OfType<RnDataIntersection>()
+                                .FirstOrDefault(x => x != intersection);
+                            if (nextIntersection != null)
+                            {
+                                info.nextTracks = nextIntersection.GetFromTracksFromBorder(getter, track.GetToBorder(getter));
+                            }
+                        }
+                        else
+                        {
+                            info.nextLanes = intersection.GetNextLanesFromTrack(getter, track);
+                        }
+
+                        var prevRoad = intersection
+                            .GetEdgesFromBorder(getter, track.GetFromBorder(getter))
+                            .FirstOrDefault()?.GetRoad(getter) as RnDataRoad;
+                        if (prevRoad?.IsEmptyRoad(getter) ?? false)
+                        {
+
+                            var prevIntersection = prevRoad.GetNeighborRoads(getter)
+                                .OfType<RnDataIntersection>()
+                                .FirstOrDefault(x => x != intersection);
+                            if (prevIntersection != null)
+                            {
+                                info.prevTracks = prevIntersection.GetToTracksFromBorder(getter, track.GetFromBorder(getter));
+                            }
+                        }
+                        else
+                        {
+                            info.prevLanes = intersection.GetPrevLanesFromTrack(getter, track);
+                        }
 
                         //Stopline
                         RnDataNeighbor nextEdge = intersection.GetEdgesFromBorder(getter, track.GetToBorder(getter)).FirstOrDefault();
@@ -194,7 +232,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
 
                 if (info.prevLanes != null)
                 {
-                    foreach(var l in info.prevLanes)
+                    foreach (var l in info.prevLanes)
                     {
                         if (laneDict.ContainsKey(l))
                             lane.PrevLanes.Add(laneDict[l]);

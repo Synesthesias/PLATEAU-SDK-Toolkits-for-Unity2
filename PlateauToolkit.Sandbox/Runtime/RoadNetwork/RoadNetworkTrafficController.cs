@@ -408,8 +408,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
 
                 if (intersection.IsEmptyIntersection)
                 {
-                    edges = intersection.Edges;
-                    edges.RemoveAll(e => e.Road.ID == m_LastRoadId);
+                    edges = intersection.Edges.Where(e => e.Road.ID == m_LastRoadId).ToList();
                     Debug.Log($"<color=green>IsEmptyIntersection edges found {edges.Count}</color>");
                 }
 
@@ -481,7 +480,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
                 if (lanes.Count <= 0 && m_EnableRunningBackwards) //逆走
                 {
                     lanes.AddRange(nextRoad.GetLanesFromNextBorder(RnGetter, nextBorder));
-                    if (lanes.Count > 0 )
+                    if (lanes.Count > 0)
                     {
                         //expectedBorders = new() { nextBorder };
                         //Debug.Log($"<color=green>Lanes From LineString Reverse {nextBorder.LineString.ID} Count {lanes.Count}</color>");
