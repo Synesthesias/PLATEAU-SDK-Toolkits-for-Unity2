@@ -131,6 +131,24 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             };
                         }
                         break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (UseTexture)
+                        {
+                            m_WallTexturedData = new WallTexturedData
+                            {
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall
+                            };
+                        }
+                        else
+                        {
+                            m_WallColorData = new WallColorData
+                            {
+                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
+                            };
+                        }
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -207,6 +225,42 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             {
                                 m_WallColor = config.commercialFacilityVertexColorPalette.wallColor,
                                 m_VertexColorWallMat = config.commercialFacilityVertexColorMaterialPalette.vertexWall
+                            };
+                        }
+                        break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (UseTexture)
+                        {
+                            m_WindowTexturedData = new ProceduralFacadeWindowElement.WindowTexturedData
+                            {
+                                m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall,
+                                m_WindowPaneMat = config.complexBuildingMaterialPalette.commercialBuildingWindowFrame,
+                                m_WindowGlassMat = config.complexBuildingMaterialPalette.commercialBuildingWindowGlass,
+                            };
+
+                            m_WallTexturedData = new WallTexturedData
+                            {
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall
+                            };
+                        }
+                        else
+                        {
+                            m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                            {
+                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
+                                m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
+                                m_VertexWindowPaneMat = config.commercialFacilityVertexColorMaterialPalette.vertexWindow,
+                            };
+
+                            m_WallColorData = new WallColorData
+                            {
+                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                             };
                         }
                         break;
@@ -426,6 +480,58 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                 m_WindowPaneGlassColor = config.hotelVertexColorPalette.windowPaneGlassColor,
                                 m_VertexWindowPaneMat = config.hotelVertexColorMaterialPalette.vertexWindowPane,
                             };
+                        }
+                        break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (UseTexture)
+                        {
+                            if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                            {
+                                m_WindowTexturedData = new WindowTexturedData
+                                {
+                                    m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                    m_UVScale = config.textureScale,
+                                    m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall,
+                                    m_WindowPaneMat = config.complexBuildingMaterialPalette.commercialBuildingWindowFrame,
+                                    m_WindowGlassMat = config.complexBuildingMaterialPalette.commercialBuildingWindowGlass,
+                                };
+                            }
+                            else
+                            {
+                                m_WindowTexturedData = new WindowTexturedData
+                                {
+                                    m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                    m_UVScale = config.textureScale,
+                                    m_WallMat = config.complexBuildingMaterialPalette.officeBuildingWall,
+                                    m_WindowPaneMat = config.complexBuildingMaterialPalette.officeBuildingWindowFrame,
+                                    m_WindowGlassMat = config.complexBuildingMaterialPalette.officeBuildingWindowGlass,
+                                };
+                            }
+                        }
+                        else
+                        {
+                            if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                            {
+                                m_WindowColorData = new WindowColorData
+                                {
+                                    m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                    m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                    m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
+                                    m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
+                                    m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
+                                };
+                            }
+                            else
+                            {
+                                m_WindowColorData = new WindowColorData
+                                {
+                                    m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                    m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                    m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
+                                    m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
+                                    m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
+                                };
+                            }
                         }
                         break;
                     default:
@@ -783,6 +889,27 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             {
                                 m_WallColor = config.commercialFacilityVertexColorPalette.depressionWallColor,
                                 m_VertexColorWallMat = config.commercialFacilityVertexColorMaterialPalette.vertexWall,
+                                m_PositionType = positionType
+                            };
+                        }
+                        break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (UseTexture)
+                        {
+                            m_DepressionWallTexturedData = new DepressionWallTexturedData
+                            {
+                                m_WallName = k_DepressionWallTexturedDraftName,
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingDepressionWall,
+                                m_PositionType = positionType
+                            };
+                        }
+                        else
+                        {
+                            m_DepressionWallColorData = new DepressionWallColorData
+                            {
+                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingDepressionWallColor,
+                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                 m_PositionType = positionType
                             };
                         }

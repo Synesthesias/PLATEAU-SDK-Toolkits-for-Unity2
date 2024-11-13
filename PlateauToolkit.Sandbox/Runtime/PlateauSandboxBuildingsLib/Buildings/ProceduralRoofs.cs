@@ -59,6 +59,20 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_RoofSideMat = m_Config.hotelMaterialPalette.roofSide;
                         m_UVScale = new Vector2(0.1f, 0.1f);
                         break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                        {
+                            m_RoofMat = m_Config.complexBuildingMaterialPalette.commercialBuildingRoof;
+                            m_RoofSideMat = m_Config.complexBuildingMaterialPalette.commercialBuildingRoofSide;
+                            m_UVScale = new Vector2(0.1f, 0.1f);
+                        }
+                        else
+                        {
+                            m_RoofMat = m_Config.complexBuildingMaterialPalette.officeBuildingRoof;
+                            m_RoofSideMat = m_Config.complexBuildingMaterialPalette.officeBuildingRoofSide;
+                            m_UVScale = new Vector2(0.1f, 0.1f);
+                        }
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -96,6 +110,20 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_RoofColor = m_Config.hotelVertexColorPalette.roofColor;
                         m_RoofSideColor = m_Config.hotelVertexColorPalette.roofSideColor;
                         m_VertexRoofMat = m_Config.hotelVertexColorMaterialPalette.vertexRoof;
+                        break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                        {
+                            m_RoofColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofColor;
+                            m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofSideColor;
+                            m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.vertexRoof;
+                        }
+                        else
+                        {
+                            m_RoofColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofColor;
+                            m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofSideColor;
+                            m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.vertexRoof;
+                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
