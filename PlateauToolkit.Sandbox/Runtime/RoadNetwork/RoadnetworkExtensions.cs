@@ -737,6 +737,52 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
             return null;
         }
 
+        /// <summary>
+        /// 境界線borderに対応する辺を取得
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="border"></param>
+        /// <param name="getter"></param>
+        /// <returns></returns>
+        public static RnDataNeighbor GetEdgeByBorder([DisallowNull] this RnDataIntersection self,
+            RoadNetworkDataGetter getter, RnDataWay border)
+        {
+            if (border == null)
+                return null;
+            return self.Edges.FirstOrDefault(x => border.IsSameLine(getter.GetWay(x.Border)));
+        }
+
+        /// <summary>
+        /// selfに対して, 利用可能なトラックかどうか
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="track"></param>
+        /// <param name="getter"></param>
+        /// <returns></returns>
+        public static bool IsAvailableTrack([DisallowNull] this RnDataIntersection self, RoadNetworkDataGetter getter, RnDataTrack track)
+        {
+            if (self.Tracks.Contains(track) == false)
+                return false;
+
+            // 行き先の道路を求める
+            var toEdge = self.GetEdgeByBorder(getter, getter.GetWay(track.ToBorder));
+            if (toEdge == null)
+                return false;
+            // 行先の無いトラックは無効
+            var rb = getter.GetRoadBase(toEdge.Road);
+            if (rb == null)
+                return false;
+            // 行き先が道の時, そのレーンがこちらに進入してくるレーンの場合は無効
+            // 道路ネットワーク生成で１車線道路は両方向扱いにしているのでそれ対策)
+            if (rb is RnDataRoad road)
+            {
+                // PrevBorderで繋がっているレーンがあるかどうか
+                return road.GetLanesFromPrevTrack(getter, track, false).Any();
+            }
+            // 行き先が交差点の場合はOK
+            return true;
+        }
+
         #endregion Intersection
 
         //Track
