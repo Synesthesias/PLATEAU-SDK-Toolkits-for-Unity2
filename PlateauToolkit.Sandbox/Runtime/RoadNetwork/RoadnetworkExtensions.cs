@@ -467,7 +467,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
 
         public static List<RnDataLane> GetLanesFromPrevBorder([DisallowNull] this RnDataRoad road, RoadNetworkDataGetter getter, RnDataWay border, bool ignoreReversedLane)
         {
-            if(!ignoreReversedLane)
+            if (!ignoreReversedLane)
                 return GetLanesFromAllBorders(road, getter, border);
 
             List<RnDataLane> mainLanes = road.GetMainLanes(getter);
@@ -539,7 +539,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
             var fromBorder = track.GetFromBorder(getter);
             return road.GetLanesFromNextBorder(getter, fromBorder, ignoreReversedLane);
         }
-        
+
         /// <summary>
         /// 道路が交差点間の間に挟まれた空の道路かどうか
         /// </summary>
@@ -571,7 +571,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
         public static List<RnDataTrack> GetFromTracksFromLane([DisallowNull] this RnDataIntersection intersection, RoadNetworkDataGetter getter, RnDataLane from)
         {
             return intersection.Tracks.Where(x => x.GetFromBorder(getter)?.IsSameLine(from.GetNextBorder(getter)) == true).ToList();
- 			//if(from.IsReverse)
+            //if(from.IsReverse)
             //    return intersection.Tracks.FindAll(x => x.GetFromBorder(getter)?.IsSameLine(from.GetPrevBorder(getter)) == true).ToList();
             //return intersection.Tracks.FindAll(x => x.GetFromBorder(getter)?.IsSameLine(from.GetNextBorder(getter)) == true).ToList();
         }
@@ -613,7 +613,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
             return prevRoad.GetLanesFromNextTrack(getter, track);
         }
 
-		 public static List<RnDataLane> GetNextLanesFromTrack([DisallowNull] this RnDataIntersection intersection, RoadNetworkDataGetter getter, RnDataTrack track, bool ignoreReversedLane)
+        public static List<RnDataLane> GetNextLanesFromTrack([DisallowNull] this RnDataIntersection intersection, RoadNetworkDataGetter getter, RnDataTrack track, bool ignoreReversedLane)
         {
             var nextEdge = intersection.GetEdgesFromBorder(getter, track.GetToBorder(getter)).FirstOrDefault();
             var nextRoad = nextEdge.GetRoad(getter) as RnDataRoad;
@@ -627,13 +627,6 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
             return prevRoad.GetLanesFromNextTrack(getter, track, ignoreReversedLane);
         }
 
-        public static List<RnDataNeighbor> GetOppositeSideEdgesFromRoad([DisallowNull] this RnDataIntersection intersection, int roadId)
-        {
-            var edges = new List<RnDataNeighbor>(intersection.Edges);
-            edges.RemoveAll(e => e.Road.ID == roadId || !e.Road.IsValid);
-            return edges;
-        }
-        
         public static List<RnDataNeighbor> GetOppositeSideEdgesFromRoad([DisallowNull] this RnDataIntersection intersection, int roadId)
         {
             return intersection.Edges.Where(e => e.Road.ID == roadId || !e.Road.IsValid).ToList();

@@ -249,7 +249,7 @@ namespace PlateauToolkit.Sandbox.RoadNetwork
 
                 if (info.prevLanes != null)
                 {
-                    foreach(var l in info.prevLanes)
+                    foreach (var l in info.prevLanes)
                     {
                         if (laneDict.ContainsKey(l))
                             lane.PrevLanes.Add(laneDict[l]);
