@@ -19,7 +19,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         private const float k_SmallWindowHeight = 1.5f;
         private const float k_BufferWidth = 2;
         private const float k_ShadowWallOffset = 0.65f;
-        private const float k_EntranceWindowTopOffset = 0.6f;
+        private const float k_EntranceWindowHeight = 2.5f;
 
         private readonly Dictionary<PanelType, List<Func<ILayoutElement>>> m_Constructors = new();
         private readonly Dictionary<PanelSize, float> m_SizeValues = new()
@@ -125,16 +125,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 }
             };
 
-            m_Constructors[PanelType.k_CommercialEntrance] = new List<Func<ILayoutElement>>
-            {
-                () => new ProceduralFacadeCompoundElements.ProceduralFullWindow(config)
-                {
-                    m_WindowFrameRodWidth = 0.1f,
-                    m_WindowFrameRodHeight = 0.2f,
-                    m_NumCenterRods = 1
-                }
-            };
-
             m_Constructors[PanelType.k_CommercialFullWindow] = new List<Func<ILayoutElement>>
             {
                 () => new ProceduralFacadeCompoundElements.ProceduralFullWindow(config)
@@ -216,7 +206,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
             return vertical;
         }
-        
+
         private VerticalLayout CreateEntranceVertical(List<PanelSize> panelSizes, float floorWidthOffset, float floorHeight, int entranceIndexInterval, bool noLeftLayout, bool noRightLayout, BuildingGenerator.Config config)
         {
             ProceduralFacadeElement.PositionType positionType = noLeftLayout switch
@@ -231,8 +221,20 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
             var vertical = new VerticalLayout
             {
-                Construct(m_Constructors[PanelType.k_CommercialEntrance], m_SizeValues[panelSizes[entranceIndexInterval]] + floorWidthOffset, entranceHeight - k_EntranceWindowTopOffset),
-                Construct(m_Constructors[PanelType.k_CommercialFullWindow], m_SizeValues[panelSizes[entranceIndexInterval]] + floorWidthOffset, k_EntranceWindowTopOffset)
+                Construct(new List<Func<ILayoutElement>>
+                {
+                    () => new ProceduralFacadeCompoundElements.ProceduralFullWindow(config)
+                    {
+                        m_WindowBottomOffset = 0,
+                        m_WindowWidthOffset = 0,
+                        m_WindowDepthOffset = 0,
+                        m_WindowFrameRodHeight = 0.2f,
+                        m_WindowFrameRodWidth = 0.2f,
+                        m_NumCenterRods = 1,
+                        m_HasWindowsill = false
+                    }
+                }, m_SizeValues[panelSizes[entranceIndexInterval]] + floorWidthOffset, k_EntranceWindowHeight),
+                Construct(m_Constructors[PanelType.k_CommercialFullWindow], m_SizeValues[panelSizes[entranceIndexInterval]] + floorWidthOffset, entranceHeight - k_EntranceWindowHeight),
             };
 
             float remainingHeight = config.buildingHeight - entranceHeight - k_SmallWallHeight;
@@ -255,7 +257,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         {
             int i = 0;
             var vertical = new VerticalLayout();
+            bool addedDepressionWall = false;
             float remainingHeight = config.buildingHeight - entranceHeight - k_SmallWallHeight - k_DepressionWallHeight;
+            float currentHeight = entranceHeight + k_SmallWallHeight + k_DepressionWallHeight;
             if (0 < remainingHeight)
             {
                 while (0 < remainingHeight)
@@ -264,22 +268,90 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     {
                         if (i++ % 4 == 3)
                         {
-                            vertical.Add(CreateHorizontal(panelSizes, from, to, k_SmallWindowHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialSmallFullWindow]));
-                            remainingHeight -= k_SmallWindowHeight;
+                            if (!addedDepressionWall && config.complexBuildingParams.buildingBoundaryHeight < currentHeight + k_SmallWindowHeight)
+                            {
+                                addedDepressionWall = true;
+                                float smallWindowHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, smallWindowHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialSmallFullWindow]));
+                                if (smallWindowHeight + k_DepressionWallHeight <= remainingHeight)
+                                {
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, config));
+                                    remainingHeight -= smallWindowHeight + k_DepressionWallHeight;
+                                    currentHeight += smallWindowHeight + k_DepressionWallHeight;
+                                }
+                                else
+                                {
+                                    // DepressionWallの高さよりもremainingHeightが小さい
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - smallWindowHeight, floorWidthOffset, config));
+                                    remainingHeight = -1;
+                                    currentHeight += remainingHeight;
+                                }
+                            }
+                            else
+                            {
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, k_SmallWindowHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialSmallFullWindow]));
+                                remainingHeight -= k_SmallWindowHeight;
+                                currentHeight += k_SmallWindowHeight;
+                            }
                         }
                         else
                         {
-                            vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-                            remainingHeight -= entranceHeight;
+                            Debug.Log($"currentHeight: {currentHeight}, entranceHeight: {entranceHeight}, remainingHeight: {remainingHeight}");
+                            if (!addedDepressionWall && config.complexBuildingParams.buildingBoundaryHeight < currentHeight + entranceHeight)
+                            {
+                                addedDepressionWall = true;
+                                float wallWithFrameHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                                Debug.Log($"currentHeight: {currentHeight}, entranceHeight: {entranceHeight}, wallWithFrameHeight: {wallWithFrameHeight}, remainingHeight: {remainingHeight}");
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, wallWithFrameHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                                if (wallWithFrameHeight + k_DepressionWallHeight <= remainingHeight)
+                                {
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, config));
+                                    remainingHeight -= wallWithFrameHeight + k_DepressionWallHeight;
+                                    currentHeight += wallWithFrameHeight + k_DepressionWallHeight;
+                                }
+                                else
+                                {
+                                    // DepressionWallの高さよりもremainingHeightが小さい
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight, floorWidthOffset, config));
+                                    remainingHeight = -1;
+                                    currentHeight += remainingHeight;
+                                }
+                            }
+                            else
+                            {
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                                remainingHeight -= entranceHeight;
+                                currentHeight += entranceHeight;
+                            }
                         }
                     }
                     else
                     {
+                        Debug.Log($"[Las] currentHeight: {currentHeight}, entranceHeight: {entranceHeight}, remainingHeight: {remainingHeight}");
                         if (Geometry.Epsilon <= remainingHeight)
                         {
-                            vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                            if (!addedDepressionWall && config.complexBuildingParams.buildingBoundaryHeight < currentHeight + remainingHeight)
+                            {
+                                float wallWithFrameHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, wallWithFrameHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                                if (wallWithFrameHeight + k_DepressionWallHeight <= remainingHeight)
+                                {
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, config));
+                                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight - k_DepressionWallHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                                }
+                                else
+                                {
+                                    // DepressionWallの高さよりもremainingHeightが小さい
+                                    vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight, floorWidthOffset, config));
+                                }
+                            }
+                            else
+                            {
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                            }
                         }
                         remainingHeight = -1;
+                        currentHeight += remainingHeight;
                     }
                 }
             }
