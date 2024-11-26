@@ -57,7 +57,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         public CommercialBuildingConfig.MaterialPalette commercialFacilityMaterialPalette = new();
 
         public HotelConfig.Params hotelParams = new();
-        public HotelConfig.ShaderParams hotelShaderParams = new();
         public HotelConfig.VertexColorPalette hotelVertexColorPalette = new();
         public HotelConfig.VertexColorMaterialPalette hotelVertexColorMaterialPalette = new();
         public HotelConfig.MaterialPalette hotelMaterialPalette = new();
