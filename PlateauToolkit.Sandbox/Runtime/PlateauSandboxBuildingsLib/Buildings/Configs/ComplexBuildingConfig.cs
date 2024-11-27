@@ -8,14 +8,14 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
     {
         public class BuildingPlannerParams
         {
-            public bool m_IsCommercialBuilding = true;
+            public BuildingType m_LowerFloorBuildingType = BuildingType.k_CommercialBuilding;
+            public BuildingType m_HigherFloorBuildingType = BuildingType.k_OfficeBuilding;
+            public bool m_AddedBoundaryWall = false;
         }
 
         [Serializable]
         public class Params
         {
-            [CustomLabel("テスト")]
-            public bool useTest = true;
             public float buildingBoundaryHeight = 15.0f;
             public float spandrelHeight = 1.25f;
         }
@@ -44,9 +44,13 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         [Serializable]
         public class VertexColorMaterialPalette
         {
-            public Material vertexWall;
-            public Material vertexWindow;
-            public Material vertexRoof;
+            public Material commercialBuildingVertexWall;
+            public Material commercialBuildingVertexWindow;
+            public Material commercialBuildingVertexRoof;
+
+            public Material officeBuildingVertexWall;
+            public Material officeBuildingVertexWindow;
+            public Material officeBuildingVertexRoof;
         }
 
         [Serializable]

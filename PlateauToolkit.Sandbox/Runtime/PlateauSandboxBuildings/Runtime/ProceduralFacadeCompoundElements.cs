@@ -142,11 +142,28 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         else
                         {
-                            m_WallColorData = new WallColorData
+                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            switch (buildingType)
                             {
-                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
-                            };
+                                case BuildingType.k_Apartment:
+                                    break;
+                                case BuildingType.k_OfficeBuilding:
+                                    m_WallColorData = new WallColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
+                                    };
+                                    break;
+                                case BuildingType.k_CommercialBuilding:
+                                    m_WallColorData = new WallColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall
+                                    };
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
                         }
                         break;
                     default:
@@ -248,20 +265,46 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         else
                         {
-                            m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            switch (buildingType)
                             {
-                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
-                                m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
-                                m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
-                                m_VertexWindowPaneMat = config.commercialFacilityVertexColorMaterialPalette.vertexWindow,
-                            };
+                                case BuildingType.k_Apartment:
+                                    break;
+                                case BuildingType.k_OfficeBuilding:
+                                    m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWindow,
+                                    };
 
-                            m_WallColorData = new WallColorData
-                            {
-                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
-                            };
+                                    m_WallColorData = new WallColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
+                                    };
+                                    break;
+                                case BuildingType.k_CommercialBuilding:
+                                    m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWindow,
+                                    };
+
+                                    m_WallColorData = new WallColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall
+                                    };
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
                         }
                         break;
                     default:
@@ -483,54 +526,65 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         break;
                     case BuildingType.k_ComplexBuilding:
+                        BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
                         if (UseTexture)
                         {
-                            if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                            switch (buildingType)
                             {
-                                m_WindowTexturedData = new WindowTexturedData
-                                {
-                                    m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
-                                    m_UVScale = config.textureScale,
-                                    m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall,
-                                    m_WindowPaneMat = config.complexBuildingMaterialPalette.commercialBuildingWindowFrame,
-                                    m_WindowGlassMat = config.complexBuildingMaterialPalette.commercialBuildingWindowGlass,
-                                };
-                            }
-                            else
-                            {
-                                m_WindowTexturedData = new WindowTexturedData
-                                {
-                                    m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
-                                    m_UVScale = config.textureScale,
-                                    m_WallMat = config.complexBuildingMaterialPalette.officeBuildingWall,
-                                    m_WindowPaneMat = config.complexBuildingMaterialPalette.officeBuildingWindowFrame,
-                                    m_WindowGlassMat = config.complexBuildingMaterialPalette.officeBuildingWindowGlass,
-                                };
+                                case BuildingType.k_Apartment:
+                                    break;
+                                case BuildingType.k_OfficeBuilding:
+                                    m_WindowTexturedData = new WindowTexturedData
+                                    {
+                                        m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                        m_UVScale = config.textureScale,
+                                        m_WallMat = config.complexBuildingMaterialPalette.officeBuildingWall,
+                                        m_WindowPaneMat = config.complexBuildingMaterialPalette.officeBuildingWindowFrame,
+                                        m_WindowGlassMat = config.complexBuildingMaterialPalette.officeBuildingWindowGlass,
+                                    };
+                                    break;
+                                case BuildingType.k_CommercialBuilding:
+                                    m_WindowTexturedData = new WindowTexturedData
+                                    {
+                                        m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
+                                        m_UVScale = config.textureScale,
+                                        m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingWall,
+                                        m_WindowPaneMat = config.complexBuildingMaterialPalette.commercialBuildingWindowFrame,
+                                        m_WindowGlassMat = config.complexBuildingMaterialPalette.commercialBuildingWindowGlass,
+                                    };
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
                         else
                         {
-                            if (config.m_ComplexBuildingPlannerParams.m_IsCommercialBuilding)
+                            switch (buildingType)
                             {
-                                m_WindowColorData = new WindowColorData
-                                {
-                                    m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                    m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
-                                    m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
-                                    m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
-                                    m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
-                                };
-                            }
-                            else
-                            {
-                                m_WindowColorData = new WindowColorData
-                                {
-                                    m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
-                                    m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
-                                    m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
-                                    m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
-                                    m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
-                                };
+                                case BuildingType.k_Apartment:
+                                    break;
+                                case BuildingType.k_OfficeBuilding:
+                                    m_WindowColorData = new WindowColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWindow,
+                                    };
+                                    break;
+                                case BuildingType.k_CommercialBuilding:
+                                    m_WindowColorData = new WindowColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWindow,
+                                    };
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
                         break;
@@ -587,6 +641,22 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             break;
                         case BuildingType.k_Hotel:
                             m_WindowColorData.m_WindowPaneGlassColor = config.hotelVertexColorPalette.windowPaneGlassColor;
+                            break;
+                        case BuildingType.k_ComplexBuilding:
+                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            switch (buildingType)
+                            {
+                                case BuildingType.k_Apartment:
+                                    break;
+                                case BuildingType.k_OfficeBuilding:
+                                    m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor;
+                                    break;
+                                case BuildingType.k_CommercialBuilding:
+                                    m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor;
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -909,7 +979,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             m_DepressionWallColorData = new DepressionWallColorData
                             {
                                 m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingDepressionWallColor,
-                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
                                 m_PositionType = positionType
                             };
                         }
