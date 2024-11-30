@@ -6,16 +6,28 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
 {
     public abstract class ComplexBuildingConfig
     {
+        public enum ComplexBuildingType
+        {
+            [EnumElement("マンション")]
+            k_Apartment,
+            [EnumElement("オフィスビル")]
+            k_OfficeBuilding,
+            [EnumElement("商業ビル")]
+            k_CommercialBuilding,
+        }
+
         public class BuildingPlannerParams
         {
-            public BuildingType m_LowerFloorBuildingType = BuildingType.k_CommercialBuilding;
-            public BuildingType m_HigherFloorBuildingType = BuildingType.k_OfficeBuilding;
             public bool m_AddedBoundaryWall = false;
         }
 
         [Serializable]
         public class Params
         {
+            [EnumElementUsage("上部の建造物タイプ", typeof(ComplexBuildingType))]
+            public ComplexBuildingType higherFloorBuildingType = ComplexBuildingType.k_OfficeBuilding;
+            [EnumElementUsage("下部の建造物タイプ", typeof(ComplexBuildingType))]
+            public ComplexBuildingType lowerFloorBuildingType = ComplexBuildingType.k_CommercialBuilding;
             public float buildingBoundaryHeight = 15.0f;
             public float spandrelHeight = 1.25f;
         }
