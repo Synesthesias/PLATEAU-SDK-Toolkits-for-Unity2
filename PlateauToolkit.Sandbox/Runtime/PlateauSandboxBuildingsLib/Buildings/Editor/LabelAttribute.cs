@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
+namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Editor
 {
     public class LabelAttribute : PropertyAttribute
     {
@@ -12,7 +12,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
         }
     }
 
-    #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(LabelAttribute))]
     public class CustomLabelAttributeDrawer : PropertyDrawer
     {
@@ -32,5 +31,4 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
             return EditorGUI.GetPropertyHeight(property, true);
         }
     }
-    #endif
 }

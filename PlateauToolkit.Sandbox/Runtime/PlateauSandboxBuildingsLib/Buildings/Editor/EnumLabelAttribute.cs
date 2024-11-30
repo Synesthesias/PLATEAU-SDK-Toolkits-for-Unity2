@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using System.Reflection;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
+namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Editor
 {
     // Enumの要素に付けるAttribute
     // PropertyAttributeではなくSystem.Attributeを継承する
@@ -34,7 +32,6 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
         }
     }
 
-    #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(EnumElementUsageAttribute))]
     public class EnumElementUsageAttributeDrawer : PropertyDrawer
     {
@@ -67,5 +64,4 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
             return EditorGUI.GetPropertyHeight(property, true);
         }
     }
-    #endif
 }
