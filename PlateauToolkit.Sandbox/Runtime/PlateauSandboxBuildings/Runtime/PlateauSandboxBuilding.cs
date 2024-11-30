@@ -67,8 +67,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         public FactoryConfig.VertexColorMaterialPalette factoryVertexColorMaterialPalette = new();
         public FactoryConfig.MaterialPalette factoryMaterialPalette = new();
 
-        public ComplexBuildingConfig.Params complexBuildingParams = new();
         public ComplexBuildingConfig.BuildingPlannerParams m_ComplexBuildingPlannerParams = new();
+        public ComplexBuildingConfig.Params complexBuildingParams = new();
         public ComplexBuildingConfig.VertexColorPalette complexBuildingVertexColorPalette = new();
         public ComplexBuildingConfig.VertexColorMaterialPalette complexBuildingVertexColorMaterialPalette = new();
         public ComplexBuildingConfig.MaterialPalette complexBuildingMaterialPalette = new();
@@ -134,7 +134,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             m_Config.factoryVertexColorPalette = factoryVertexColorPalette;
             m_Config.factoryVertexColorMaterialPalette = factoryVertexColorMaterialPalette;
             m_Config.factoryMaterialPalette = factoryMaterialPalette;
-            
+
             m_Config.m_ComplexBuildingPlannerParams = m_ComplexBuildingPlannerParams;
             m_Config.complexBuildingParams = complexBuildingParams;
             m_Config.complexBuildingVertexColorPalette = complexBuildingVertexColorPalette;

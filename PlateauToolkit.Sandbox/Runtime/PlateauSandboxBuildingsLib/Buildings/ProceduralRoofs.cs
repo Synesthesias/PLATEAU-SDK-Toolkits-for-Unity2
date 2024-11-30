@@ -1,3 +1,4 @@
+using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Configs;
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Interfaces;
 using ProceduralToolkit;
 using ProceduralToolkit.Skeleton;
@@ -68,17 +69,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_UVScale = new Vector2(0.1f, 0.1f);
                         break;
                     case BuildingType.k_ComplexBuilding:
-                        BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                        ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                         switch (buildingType)
                         {
-                            case BuildingType.k_Apartment:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                 break;
-                            case BuildingType.k_OfficeBuilding:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                 m_RoofMat = m_Config.complexBuildingMaterialPalette.officeBuildingRoof;
                                 m_RoofSideMat = m_Config.complexBuildingMaterialPalette.officeBuildingRoofSide;
                                 m_UVScale = new Vector2(0.1f, 0.1f);
                                 break;
-                            case BuildingType.k_CommercialBuilding:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                 m_RoofMat = m_Config.complexBuildingMaterialPalette.commercialBuildingRoof;
                                 m_RoofSideMat = m_Config.complexBuildingMaterialPalette.commercialBuildingRoofSide;
                                 m_UVScale = new Vector2(0.1f, 0.1f);
@@ -132,17 +133,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         m_VertexRoofMat = m_Config.factoryVertexColorMaterialPalette.vertexRoof;
                         break;
                     case BuildingType.k_ComplexBuilding:
-                        BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                        ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                         switch (buildingType)
                         {
-                            case BuildingType.k_Apartment:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                 break;
-                            case BuildingType.k_OfficeBuilding:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                 m_RoofColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofColor;
                                 m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofSideColor;
                                 m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexRoof;
                                 break;
-                            case BuildingType.k_CommercialBuilding:
+                            case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                 m_RoofColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofColor;
                                 m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofSideColor;
                                 m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexRoof;

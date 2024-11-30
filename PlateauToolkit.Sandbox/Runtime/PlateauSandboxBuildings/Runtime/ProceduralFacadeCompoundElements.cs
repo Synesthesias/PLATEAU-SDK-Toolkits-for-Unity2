@@ -1,5 +1,6 @@
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib;
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings;
+using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Configs;
 using ProceduralToolkit;
 using System;
 using UnityEngine;
@@ -160,19 +161,19 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         else
                         {
-                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                             switch (buildingType)
                             {
-                                case BuildingType.k_Apartment:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                     break;
-                                case BuildingType.k_OfficeBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
                                         m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
                                     };
                                     break;
-                                case BuildingType.k_CommercialBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
@@ -283,12 +284,12 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         else
                         {
-                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                             switch (buildingType)
                             {
-                                case BuildingType.k_Apartment:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                     break;
-                                case BuildingType.k_OfficeBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
@@ -304,7 +305,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                         m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
                                     };
                                     break;
-                                case BuildingType.k_CommercialBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
@@ -573,14 +574,14 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         }
                         break;
                     case BuildingType.k_ComplexBuilding:
-                        BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                        ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                         if (UseTexture)
                         {
                             switch (buildingType)
                             {
-                                case BuildingType.k_Apartment:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                     break;
-                                case BuildingType.k_OfficeBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowTexturedData = new WindowTexturedData
                                     {
                                         m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
@@ -590,7 +591,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                         m_WindowGlassMat = config.complexBuildingMaterialPalette.officeBuildingWindowGlass,
                                     };
                                     break;
-                                case BuildingType.k_CommercialBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowTexturedData = new WindowTexturedData
                                     {
                                         m_WindowpaneGlassName = k_WindowGlassTexturedDraftName,
@@ -608,9 +609,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             switch (buildingType)
                             {
-                                case BuildingType.k_Apartment:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                     break;
-                                case BuildingType.k_OfficeBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowColorData = new WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
@@ -620,7 +621,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                         m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWindow,
                                     };
                                     break;
-                                case BuildingType.k_CommercialBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData = new WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
@@ -705,15 +706,15 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             m_WindowColorData.m_WindowPaneGlassColor = config.hotelVertexColorPalette.windowPaneGlassColor;
                             break;
                         case BuildingType.k_ComplexBuilding:
-                            BuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.m_ComplexBuildingPlannerParams.m_HigherFloorBuildingType : config.m_ComplexBuildingPlannerParams.m_LowerFloorBuildingType;
+                            ComplexBuildingConfig.ComplexBuildingType buildingType = config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall ? config.complexBuildingParams.higherFloorBuildingType : config.complexBuildingParams.lowerFloorBuildingType;
                             switch (buildingType)
                             {
-                                case BuildingType.k_Apartment:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                                     break;
-                                case BuildingType.k_OfficeBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor;
                                     break;
-                                case BuildingType.k_CommercialBuilding:
+                                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor;
                                     break;
                                 default:
