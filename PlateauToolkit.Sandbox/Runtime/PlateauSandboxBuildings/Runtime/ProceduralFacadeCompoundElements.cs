@@ -1026,6 +1026,10 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         {
             protected readonly DepressionWallColorData m_DepressionWallColorData;
             protected readonly DepressionWallTexturedData m_DepressionWallTexturedData;
+            public float m_DepressionWallDepth = 0.3f;
+            public string m_DepressionWallName = null;
+            public Material m_DepressionWallMat = null;
+            public Color? m_DepressionWallColor = null;
 
             public ProceduralDepressionWall(BuildingGenerator.Config config, PositionType positionType) : base(config)
             {
@@ -1038,7 +1042,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             {
                                 m_WallName = k_DepressionWallTexturedDraftName,
                                 m_UVScale = config.textureScale,
-                                m_WallMat = config.commercialFacilityMaterialPalette.depressionWall,
+                                m_DepressionWallMat = config.commercialFacilityMaterialPalette.depressionWall,
                                 m_PositionType = positionType
                             };
                         }
@@ -1059,7 +1063,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             {
                                 m_WallName = k_DepressionWallTexturedDraftName,
                                 m_UVScale = config.textureScale,
-                                m_WallMat = config.complexBuildingMaterialPalette.commercialBuildingDepressionWall,
+                                m_DepressionWallMat = config.complexBuildingMaterialPalette.commercialBuildingDepressionWall,
                                 m_PositionType = positionType
                             };
                         }
@@ -1082,6 +1086,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             {
                 Vector3 widthVector = Vector3.right * width;
                 Vector3 heightVector = Vector3.up * height;
+                if (UseTexture)
+                {
+                    m_DepressionWallTexturedData.m_WallName = m_DepressionWallName ?? m_DepressionWallTexturedData.m_WallName;
+                    m_DepressionWallTexturedData.m_DepressionWallDepth = m_DepressionWallDepth;
+                    m_DepressionWallTexturedData.m_DepressionWallMat = m_DepressionWallMat != null ? m_DepressionWallMat : m_DepressionWallTexturedData.m_DepressionWallMat;
+                }
+                else
+                {
+                    m_DepressionWallColorData.m_DepressionWallDepth = m_DepressionWallDepth;
+                    m_DepressionWallColorData.m_DepressionWallColor = m_DepressionWallColor ?? m_DepressionWallColorData.m_DepressionWallColor;
+                }
 
                 return new CompoundMeshDraft().Add(UseTexture
                     ? DepressionWallTextured(parentLayoutOrigin + origin, widthVector, heightVector, m_DepressionWallTexturedData)

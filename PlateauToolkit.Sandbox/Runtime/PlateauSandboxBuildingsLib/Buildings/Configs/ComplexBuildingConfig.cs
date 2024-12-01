@@ -36,6 +36,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         [Serializable]
         public class VertexColorPalette
         {
+            public Color boundaryWallColor = ColorE.gray;
+
             public Color commercialBuildingWallColor = ColorE.white;
             public Color commercialBuildingDepressionWallColor = ColorE.white;
             public Color commercialBuildingWindowFrameColor = ColorE.gray;
@@ -69,6 +71,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         [Serializable]
         public class MaterialPalette
         {
+            public Material boundaryWall;
+
             public Material commercialBuildingWall;
             public Material commercialBuildingDepressionWall;
             public Material commercialBuildingWindowFrame;
