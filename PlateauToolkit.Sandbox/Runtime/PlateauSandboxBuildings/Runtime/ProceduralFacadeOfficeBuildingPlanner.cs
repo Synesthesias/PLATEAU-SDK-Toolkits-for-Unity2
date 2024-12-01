@@ -132,11 +132,11 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             {
                 () => new ProceduralFacadeCompoundElements.ProceduralFullWindow(
                     config,
-                    "SmallFullWindowTextured",
-                    config.officeBuildingMaterialPalette.spandrel
-                    )
+                    config.officeBuildingMaterialPalette.spandrel,
+                    "GlassSpandrelTextured",
+                    "FrameSpandrelTextured")
                 {
-                    m_WindowFrameRodWidth = 0.2f,
+                    m_WindowFrameRodWidth = 0.2f
                 }
             };
             m_Constructors[PanelType.k_FullWindow] = new List<Func<ILayoutElement>>
