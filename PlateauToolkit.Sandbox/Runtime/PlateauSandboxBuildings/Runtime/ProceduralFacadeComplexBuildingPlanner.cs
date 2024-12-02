@@ -440,7 +440,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 {
                     if (addedBoundaryWall)
                     {
-                        // config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
+                        config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
                         switch (floorIndex++ % 2)
                         {
                             case 0:
@@ -501,139 +501,92 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
         private (int, bool, float, float) CreateCommercialBuildingPlanner(VerticalLayout vertical ,int floorIndex, bool addedBoundaryWall, float currentHeight, float remainingHeight, List<PanelSize> panelSizes, float floorWidthOffset, float entranceHeight, int from, int to, BuildingGenerator.Config config)
         {
+            PanelType panelType = floorIndex % 4 == 3 ? PanelType.k_CommercialSmallFullWindow : PanelType.k_CommercialWallWithFrame;
+            float panelHeight = floorIndex % 4 == 3 ? k_SmallWindowHeight : entranceHeight;
+
             if (entranceHeight <= remainingHeight)
             {
-                if (floorIndex++ % 4 == 3)
+                if (addedBoundaryWall)
                 {
-                    if (addedBoundaryWall)
-                    {
+                    config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, panelHeight, floorWidthOffset, m_Constructors[panelType]));
+                    remainingHeight -= panelHeight;
+                    currentHeight += panelHeight;
+                }
+                // 繋ぎ目未作成で境界線を超える場合
+                else if (config.complexBuildingParams.buildingBoundaryHeight < currentHeight + panelHeight)
+                {
+                    addedBoundaryWall = true;
+                    float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
 
-                    }
-                    // 繋ぎ目未作成で境界線を超える場合
-                    else if (config.complexBuildingParams.buildingBoundaryHeight < currentHeight + k_SmallWindowHeight)
+                    if (remainingLowerBuildingHeight + k_DepressionWallHeight <= remainingHeight)
                     {
-                        addedBoundaryWall = true;
-                        float smallWindowHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, smallWindowHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialSmallFullWindow]));
-
-                        if (smallWindowHeight + k_DepressionWallHeight <= remainingHeight)
-                        {
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
-                            remainingHeight -= smallWindowHeight + k_DepressionWallHeight;
-                            currentHeight += smallWindowHeight + k_DepressionWallHeight;
-                        }
-                        else
-                        {
-                            // DepressionWallの高さよりもremainingHeightが小さい
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - smallWindowHeight, floorWidthOffset, false, config));
-                            remainingHeight = -1;
-                            currentHeight += remainingHeight;
-                        }
+                        // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが大きい
+                        vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
+                        remainingHeight -= remainingLowerBuildingHeight + k_DepressionWallHeight;
+                        currentHeight += remainingLowerBuildingHeight + k_DepressionWallHeight;
                     }
                     else
                     {
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, k_SmallWindowHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialSmallFullWindow]));
-                        remainingHeight -= k_SmallWindowHeight;
-                        currentHeight += k_SmallWindowHeight;
+                        // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが小さい
+                        vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - remainingLowerBuildingHeight, floorWidthOffset, false, config));
+                        remainingHeight = -1;
+                        currentHeight += remainingHeight;
                     }
                 }
                 else
                 {
-                    if (addedBoundaryWall)
-                    {
-
-                    }
-                    // 繋ぎ目未作成で境界線を超える場合
-                    else if (config.complexBuildingParams.buildingBoundaryHeight < currentHeight + entranceHeight)
-                    {
-                        addedBoundaryWall = true;
-                        float wallWithFrameHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight; vertical.Add(CreateHorizontal(panelSizes, from, to, wallWithFrameHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-
-                        if (wallWithFrameHeight + k_DepressionWallHeight <= remainingHeight)
-                        {
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
-                            remainingHeight -= wallWithFrameHeight + k_DepressionWallHeight;
-                            currentHeight += wallWithFrameHeight + k_DepressionWallHeight;
-                        }
-                        else
-                        {
-                            // DepressionWallの高さよりもremainingHeightが小さい
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight, floorWidthOffset, false, config));
-                            remainingHeight = -1;
-                            currentHeight += remainingHeight;
-                        }
-                    }
-                    else
-                    {
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-                        remainingHeight -= entranceHeight;
-                        currentHeight += entranceHeight;
-                    }
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, panelHeight, floorWidthOffset, m_Constructors[panelType]));
+                    remainingHeight -= panelHeight;
+                    currentHeight += panelHeight;
                 }
             }
             else
             {
-                if (Geometry.Epsilon <= remainingHeight)
+                if (addedBoundaryWall)
                 {
-                    if (addedBoundaryWall)
-                    {
-                        // switch (floorIndex++ % 2)
-                        // {
-                        //     case 0:
-                        //         remainingHeight -= config.complexBuildingParams.spandrelHeight;
-                        //         vertical.Add(remainingHeight < 0
-                        //             ? CreateHorizontal(panelSizes, from, to, config.complexBuildingParams.spandrelHeight + remainingHeight,
-                        //                 floorWidthOffset, m_Constructors[PanelType.k_OfficeSmallFullWindow])
-                        //             : CreateHorizontal(panelSizes, from, to, config.complexBuildingParams.spandrelHeight, floorWidthOffset,
-                        //                 m_Constructors[PanelType.k_OfficeSmallFullWindow]));
-                        //         break;
-                        //     case 1:
-                        //         remainingHeight -= entranceHeight;
-                        //         vertical.Add(remainingHeight < 0
-                        //             ? CreateHorizontal(panelSizes, from, to, entranceHeight + remainingHeight, floorWidthOffset,
-                        //                 m_Constructors[PanelType.k_OfficeFullWindow])
-                        //             : CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset,
-                        //                 m_Constructors[PanelType.k_OfficeFullWindow]));
-                        //         break;
-                        // }
-                    }
-                    else if (config.complexBuildingParams.buildingBoundaryHeight < currentHeight + remainingHeight)
-                    {
-                        float wallWithFrameHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, wallWithFrameHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-                        if (wallWithFrameHeight + k_DepressionWallHeight <= remainingHeight)
-                        {
-                            // DepressionWallの高さよりもremainingHeightが高い
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
+                    config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
+                    remainingHeight -= panelHeight;
+                    currentHeight += panelHeight;
+                    vertical.Add(remainingHeight < 0
+                        ? CreateHorizontal(panelSizes, from, to, panelHeight + remainingHeight, floorWidthOffset, m_Constructors[panelType])
+                        : CreateHorizontal(panelSizes, from, to, panelHeight, floorWidthOffset, m_Constructors[panelType]));
+                }
+                else if (config.complexBuildingParams.buildingBoundaryHeight < currentHeight + remainingHeight)
+                {
+                    // 境界線までの高さ分を埋める
+                    float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
 
-                            addedBoundaryWall = true;
-                            config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
-                            vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight - k_DepressionWallHeight, floorWidthOffset, m_Constructors[PanelType.k_OfficeSmallFullWindow]));
-                        }
-                        else
-                        {
-                            // DepressionWallの高さよりもremainingHeightが低い
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - wallWithFrameHeight, floorWidthOffset, false, config));
-                        }
-
-                        // 上記処理で残りの高さを全て埋めている
-                        remainingHeight = -1;
-                        currentHeight += remainingHeight;
+                    if (remainingLowerBuildingHeight + k_DepressionWallHeight <= remainingHeight)
+                    {
+                        // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが高い（残りの高さは上部のタイプで埋める）
+                        addedBoundaryWall = true;
+                        vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
+                        remainingHeight -= k_DepressionWallHeight;
+                        currentHeight += k_DepressionWallHeight;
                     }
                     else
                     {
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-
-                        // 上記処理で残りの高さを全て埋めている
+                        // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが低い（残りの高さを全て埋める）
+                        vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight - remainingLowerBuildingHeight, floorWidthOffset, false, config));
                         remainingHeight = -1;
                         currentHeight += remainingHeight;
                     }
                 }
+                else
+                {
+                    // 残りの高さを全て埋める
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, m_Constructors[panelType]));
+                    remainingHeight = -1;
+                    currentHeight += remainingHeight;
+                }
             }
 
+            floorIndex++;
             return (floorIndex, addedBoundaryWall, currentHeight, remainingHeight);
         }
-
 
         private List<PanelSize> DivideFacade(float facadeWidth, bool leftIsConvex, bool rightIsConvex, out float remainder)
         {
