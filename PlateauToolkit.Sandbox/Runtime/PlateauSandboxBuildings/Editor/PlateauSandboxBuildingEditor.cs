@@ -57,6 +57,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
         private SerializedProperty m_FactoryMaterialPalette;
 
         private SerializedProperty m_ComplexBuildingParams;
+        private SerializedProperty m_ComplexSkyscraperCondominiumBuildingParams;
+        private SerializedProperty m_ComplexOfficeBuildingParams;
         private SerializedProperty m_ComplexBuildingVertexColorPalette;
         private SerializedProperty m_ComplexBuildingVertexColorMaterialPalette;
         private SerializedProperty m_ComplexBuildingMaterialPalette;
@@ -115,6 +117,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
             m_FactoryMaterialPalette = serializedObject.FindProperty("factoryMaterialPalette");
 
             m_ComplexBuildingParams = serializedObject.FindProperty("complexBuildingParams");
+            m_ComplexSkyscraperCondominiumBuildingParams = serializedObject.FindProperty("complexSkyscraperCondominiumBuildingParams");
+            m_ComplexOfficeBuildingParams = serializedObject.FindProperty("complexOfficeBuildingParams");
             m_ComplexBuildingVertexColorPalette = serializedObject.FindProperty("complexBuildingVertexColorPalette");
             m_ComplexBuildingVertexColorMaterialPalette = serializedObject.FindProperty("complexBuildingVertexColorMaterialPalette");
             m_ComplexBuildingMaterialPalette = serializedObject.FindProperty("complexBuildingMaterialPalette");
@@ -540,11 +544,20 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                     return DrawDynamicPropertyOnly(m_FactoryParams);
                 case (int)BuildingType.k_ComplexBuilding:
                     EditorGUILayout.LabelField("複合ビル設定", EditorStyles.boldLabel);
-                    return DrawDynamicPropertyOnly(m_ComplexBuildingParams, new Dictionary<string, Tuple<string, float, float>>
+                    bool changedComplexBuildingParam = DrawDynamicPropertyOnly(m_ComplexBuildingParams, new Dictionary<string, Tuple<string, float, float>>
                     {
                         {"buildingBoundaryHeight", new Tuple<string, float, float>("建物同士の境界線の高さ", 10f, 100f)},
+                    });
+                    EditorGUILayout.Space(10);
+                    EditorGUILayout.LabelField("マンション設定", EditorStyles.boldLabel);
+                    bool changedComplexSkyscraperCondominiumBuildingParam = DrawDynamicPropertyOnly(m_ComplexSkyscraperCondominiumBuildingParams);
+                    EditorGUILayout.Space(10);
+                    EditorGUILayout.LabelField("オフィスビル設定", EditorStyles.boldLabel);
+                    bool changedComplexOfficeBuildingParam = DrawDynamicPropertyOnly(m_ComplexOfficeBuildingParams, new Dictionary<string, Tuple<string, float, float>>
+                    {
                         {"spandrelHeight", new Tuple<string, float, float>("壁パネルの高さ", 0.25f, 2.5f)}
                     });
+                    return changedComplexBuildingParam || changedComplexSkyscraperCondominiumBuildingParam || changedComplexOfficeBuildingParam;
             }
             return false;
         }

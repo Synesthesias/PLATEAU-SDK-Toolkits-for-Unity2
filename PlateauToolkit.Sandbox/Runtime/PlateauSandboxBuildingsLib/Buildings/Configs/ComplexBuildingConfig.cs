@@ -30,6 +30,28 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
             [EnumElementUsage("下部の建造物タイプ", typeof(ComplexBuildingType))]
             public ComplexBuildingType lowerFloorBuildingType = ComplexBuildingType.k_CommercialBuilding;
             public float buildingBoundaryHeight = 15.0f;
+        }
+
+        [Serializable]
+        public class SkyscraperCondominiumParams
+        {
+            [Label("バルコニーを外壁にせり出す(1m)")]
+            public bool convexBalcony;
+            [Label("窓ガラスバルコニーに切り替え")]
+            public bool hasBalconyGlass;
+            [Label("左側にバルコニーを作成")]
+            public bool hasBalconyLeft;
+            [Label("右側にバルコニーを作成")]
+            public bool hasBalconyRight;
+            [Label("前側にバルコニーを作成")]
+            public bool hasBalconyFront;
+            [Label("後ろ側にバルコニーを作成")]
+            public bool hasBalconyBack;
+        }
+        
+        [Serializable]
+        public class OfficeParams
+        {
             public float spandrelHeight = 1.25f;
         }
 

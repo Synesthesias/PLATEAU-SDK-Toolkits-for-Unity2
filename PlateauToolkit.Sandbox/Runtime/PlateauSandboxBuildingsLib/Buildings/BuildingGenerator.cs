@@ -141,6 +141,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
 
             public ComplexBuildingConfig.BuildingPlannerParams m_ComplexBuildingPlannerParams = new();
             public ComplexBuildingConfig.Params complexBuildingParams = new();
+            public ComplexBuildingConfig.SkyscraperCondominiumParams complexSkyscraperCondominiumBuildingParams = new();
+            public ComplexBuildingConfig.OfficeParams complexOfficeBuildingParams = new();
             public ComplexBuildingConfig.VertexColorPalette complexBuildingVertexColorPalette = new();
             public ComplexBuildingConfig.VertexColorMaterialPalette complexBuildingVertexColorMaterialPalette = new();
             public ComplexBuildingConfig.MaterialPalette complexBuildingMaterialPalette = new();

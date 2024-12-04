@@ -69,6 +69,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
         public ComplexBuildingConfig.BuildingPlannerParams m_ComplexBuildingPlannerParams = new();
         public ComplexBuildingConfig.Params complexBuildingParams = new();
+        public ComplexBuildingConfig.SkyscraperCondominiumParams complexSkyscraperCondominiumBuildingParams = new();
+        public ComplexBuildingConfig.OfficeParams complexOfficeBuildingParams = new();
         public ComplexBuildingConfig.VertexColorPalette complexBuildingVertexColorPalette = new();
         public ComplexBuildingConfig.VertexColorMaterialPalette complexBuildingVertexColorMaterialPalette = new();
         public ComplexBuildingConfig.MaterialPalette complexBuildingMaterialPalette = new();
@@ -137,6 +139,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
             m_Config.m_ComplexBuildingPlannerParams = m_ComplexBuildingPlannerParams;
             m_Config.complexBuildingParams = complexBuildingParams;
+            m_Config.complexSkyscraperCondominiumBuildingParams = complexSkyscraperCondominiumBuildingParams;
+            m_Config.complexOfficeBuildingParams = complexOfficeBuildingParams;
             m_Config.complexBuildingVertexColorPalette = complexBuildingVertexColorPalette;
             m_Config.complexBuildingVertexColorMaterialPalette = complexBuildingVertexColorMaterialPalette;
             m_Config.complexBuildingMaterialPalette = complexBuildingMaterialPalette;

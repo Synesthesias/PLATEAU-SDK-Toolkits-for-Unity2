@@ -538,7 +538,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                     panelType = floorIndex % 2 == 0 ? PanelType.k_OfficeSmallFullWindow : PanelType.k_OfficeFullWindow;
-                    panelHeight = floorIndex % 2 == 0 ? config.complexBuildingParams.spandrelHeight : entranceHeight;
+                    panelHeight = floorIndex % 2 == 0 ? config.complexOfficeBuildingParams.spandrelHeight : entranceHeight;
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                     panelType = floorIndex % 4 == 3 ? PanelType.k_CommercialSmallFullWindow : PanelType.k_CommercialWallWithFrame;
