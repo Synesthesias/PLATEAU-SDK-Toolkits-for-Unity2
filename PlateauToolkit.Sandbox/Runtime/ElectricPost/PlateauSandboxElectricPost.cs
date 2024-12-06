@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
@@ -24,6 +25,9 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         private PlateauSandboxElectricPostInfo m_Info;
         public (PlateauSandboxElectricPost target, bool isFront) FrontConnectedPost => m_Info?.FrontConnectedPost ?? (null, false);
         public (PlateauSandboxElectricPost target, bool isFront) BackConnectedPost => m_Info?.BackConnectedPost ?? (null, false);
+
+        public List<(PlateauSandboxElectricPost target, bool isFront)> FrontConnectedPosts => m_Info?.FrontConnectedPosts;
+        public List<(PlateauSandboxElectricPost target, bool isFront)> BackConnectedPosts => m_Info?.BackConnectedPosts;
 
         private void Start()
         {
@@ -58,6 +62,16 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             {
                 m_Info.BackConnectedPost.target.RemoveConnectedPost(this);
             }
+        }
+
+        public void AddConnection(bool isFront)
+        {
+            m_Info.AddConnection(isFront);
+        }
+
+        public void RemoveConnection(bool isFront)
+        {
+            m_Info.RemoveConnection(isFront, isFront? FrontConnectedPosts.Count - 1 : BackConnectedPosts.Count - 1);
         }
 
         private void SearchPost()
