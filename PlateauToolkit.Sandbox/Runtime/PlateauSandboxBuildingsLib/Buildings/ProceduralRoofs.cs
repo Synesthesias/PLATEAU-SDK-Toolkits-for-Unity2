@@ -73,6 +73,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         switch (buildingType)
                         {
                             case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
+                                m_RoofMat = m_Config.complexBuildingMaterialPalette.apartmentRoof;
+                                m_RoofSideMat = m_Config.complexBuildingMaterialPalette.apartmentRoofSide;
+                                m_UVScale = new Vector2(0.1f, 0.1f);
                                 break;
                             case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                 m_RoofMat = m_Config.complexBuildingMaterialPalette.officeBuildingRoof;

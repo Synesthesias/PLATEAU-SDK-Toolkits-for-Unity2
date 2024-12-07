@@ -48,7 +48,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
             [Label("後ろ側にバルコニーを作成")]
             public bool hasBalconyBack;
         }
-        
+
         [Serializable]
         public class OfficeParams
         {
@@ -60,34 +60,42 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         {
             public Color boundaryWallColor = ColorE.gray;
 
-            public Color commercialBuildingWallColor = ColorE.white;
-            public Color commercialBuildingDepressionWallColor = ColorE.white;
-            public Color commercialBuildingWindowFrameColor = ColorE.gray;
-            public Color commercialBuildingWindowGlassColor = ColorE.white;
-
-            public Color commercialBuildingRoofColor = (ColorE.gray/4).WithA(1);
-            public Color commercialBuildingRoofSideColor = (ColorE.gray/4).WithA(1);
+            public Color apartmentWallColor = ColorE.white;
+            public Color apartmentWindowFrameColor = ColorE.gray;
+            public Color apartmentWindowGlassColor = ColorE.white;
+            public Color apartmentRoofColor = (ColorE.gray/4).WithA(1);
+            public Color apartmentRoofSideColor = (ColorE.gray/4).WithA(1);
 
             public Color officeBuildingWallColor = ColorE.white;
             public Color officeBuildingWindowFrameColor = ColorE.gray;
             public Color officeBuildingWindowGlassColor = ColorE.white;
             public Color officeBuildingSpandrelColor = ColorE.white;
-
             public Color officeBuildingRoofColor = (ColorE.gray/4).WithA(1);
             public Color officeBuildingRoofSideColor = (ColorE.gray/4).WithA(1);
+
+            public Color commercialBuildingWallColor = ColorE.white;
+            public Color commercialBuildingDepressionWallColor = ColorE.white;
+            public Color commercialBuildingWindowFrameColor = ColorE.gray;
+            public Color commercialBuildingWindowGlassColor = ColorE.white;
+            public Color commercialBuildingRoofColor = (ColorE.gray/4).WithA(1);
+            public Color commercialBuildingRoofSideColor = (ColorE.gray/4).WithA(1);
         }
 
 
         [Serializable]
         public class VertexColorMaterialPalette
         {
-            public Material commercialBuildingVertexWall;
-            public Material commercialBuildingVertexWindow;
-            public Material commercialBuildingVertexRoof;
+            public Material apartmentVertexWall;
+            public Material apartmentVertexWindow;
+            public Material apartmentVertexRoof;
 
             public Material officeBuildingVertexWall;
             public Material officeBuildingVertexWindow;
             public Material officeBuildingVertexRoof;
+
+            public Material commercialBuildingVertexWall;
+            public Material commercialBuildingVertexWindow;
+            public Material commercialBuildingVertexRoof;
         }
 
         [Serializable]
@@ -95,21 +103,25 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         {
             public Material boundaryWall;
 
-            public Material commercialBuildingWall;
-            public Material commercialBuildingDepressionWall;
-            public Material commercialBuildingWindowFrame;
-            public Material commercialBuildingWindowGlass;
-
-            public Material commercialBuildingRoof;
-            public Material commercialBuildingRoofSide;
+            public Material apartmentWall;
+            public Material apartmentWindowFrame;
+            public Material apartmentWindowGlass;
+            public Material apartmentRoof;
+            public Material apartmentRoofSide;
 
             public Material officeBuildingWall;
             public Material officeBuildingWindowFrame;
             public Material officeBuildingWindowGlass;
             public Material officeBuildingSpandrel;
-
             public Material officeBuildingRoof;
             public Material officeBuildingRoofSide;
+
+            public Material commercialBuildingWall;
+            public Material commercialBuildingDepressionWall;
+            public Material commercialBuildingWindowFrame;
+            public Material commercialBuildingWindowGlass;
+            public Material commercialBuildingRoof;
+            public Material commercialBuildingRoofSide;
         }
     }
 }
