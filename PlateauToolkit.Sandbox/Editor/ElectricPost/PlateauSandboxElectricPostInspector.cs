@@ -9,65 +9,14 @@ using UnityEngine;
 
 namespace PlateauToolkit.Sandbox.Editor
 {
-    public struct PlateauSandboxElectricPostKeyEvent
-    {
-        private EventType keyEventType;
-        private KeyCode keyCode;
-        private (int id, PlateauSandboxElectricPost post) focusPost;
-
-        public void SetFocusPost(int controlID, PlateauSandboxElectricPost post)
-        {
-            focusPost = (controlID, post);
-        }
-
-        private void SetKeyEvent()
-        {
-            keyEventType = Event.current.type;
-            keyCode = Event.current.keyCode;
-        }
-
-        public bool IsFocusDelete(int controlID)
-        {
-            GUI.GetNameOfFocusedControl()
-
-            if (focusPost.post == null)
-            {
-                return false;
-            }
-
-            SetKeyEvent();
-            return focusControlID == GUIUtility.hotControl && IsDeleteKey();
-        }
-
-        public bool IsDeleteKey()
-        {
-            SetKeyEvent();
-            return keyEventType == EventType.KeyDown && keyCode == KeyCode.Delete;
-        }
-
-        public bool IsEscapeKey()
-        {
-            SetKeyEvent();
-            return keyEventType == EventType.KeyDown && keyCode == KeyCode.Escape;
-        }
-    }
-
     [CustomEditor(typeof(PlateauSandboxElectricPost))]
     public class PlateauSandboxElectricPostInspector : UnityEditor.Editor
     {
         private PlateauSandboxElectricPostContext m_Context;
-
-        private const string k_FrontTargetNodeName = "前方接続部";
-        private const string k_BackTargetNodeName = "後方接続部";
-
-        // 接続先が正面かどうか
-        private const string k_IsDestinationFrontName = "接続先が前方接続";
-
         private PlateauSandboxElectricPost m_Target;
 
         private PlateauSandboxElectricPostConnectionGUI m_FrontConnectionGUI;
         private PlateauSandboxElectricPostConnectionGUI m_BackConnectionGUI;
-
         private PlateauSandboxElectricPostKeyEvent m_KeyEvent;
 
         private void OnEnable()
@@ -85,14 +34,14 @@ namespace PlateauToolkit.Sandbox.Editor
             if (m_FrontConnectionGUI == null)
             {
                 m_FrontConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, true, m_KeyEvent);
-                // m_FrontConnectionGUI.OnClickSelect.AddListener(() => SelectedPost(m_Target.FrontConnectedPost.target));
+                m_FrontConnectionGUI.OnClickSelect.AddListener(SelectingPost);
                 // m_FrontConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(true));
                 // m_FrontConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetFrontConnectPointToFacing(post));
             }
             if (m_BackConnectionGUI == null)
             {
                 m_BackConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, false, m_KeyEvent);
-                // m_BackConnectionGUI.OnClickSelect.AddListener(() => SelectedPost(m_Target.BackConnectedPost.target));
+                m_BackConnectionGUI.OnClickSelect.AddListener(() => SelectedPost(m_Target.BackConnectedPost.target));
                 // m_BackConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(false));
                 // m_BackConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetBackConnectPointToFacing(post));
             }
@@ -110,68 +59,27 @@ namespace PlateauToolkit.Sandbox.Editor
 
             m_FrontConnectionGUI.DrawLayout(m_Target.FrontConnectedPosts);
             m_BackConnectionGUI.DrawLayout(m_Target.BackConnectedPosts);
-            //
-            // GUILayout.Space(5);
-            //
-            // var frontTarget = EditorGUILayout.ObjectField(
-            //                       k_FrontTargetNodeName,
-            //                       m_Target.FrontConnectedPost.target,
-            //                       typeof(PlateauSandboxElectricPost), true) as PlateauSandboxElectricPost;
-            //
-            // if (frontTarget != null && frontTarget != m_Target)
-            // {
-            //     m_Target.SetFrontConnectPointToFacing(frontTarget);
-            // }
-            //
-            // CreateDestinationCheckbox(true);
-            // GUILayout.Space(5);
-            //
-            // // ボタン作成
-            // using (new EditorGUILayout.HorizontalScope())
-            // {
-            //     GUILayout.FlexibleSpace();
-            //     CreateSelectButton(true);
-            //     GUILayout.Space(5);
-            //     CreateReleaseButton(true);
-            // }
-            // GUILayout.Space(10);
-            //
-            // // 後ろの電線の設定
-            // var backTarget = EditorGUILayout.ObjectField(
-            //                      k_BackTargetNodeName,
-            //                      m_Target.BackConnectedPost.target,
-            //                      typeof(PlateauSandboxElectricPost), true) as PlateauSandboxElectricPost;
-            //
-            // if (backTarget != null && backTarget != m_Target)
-            // {
-            //     m_Target.SetBackConnectPointToFacing(backTarget);
-            // }
-            //
-            // CreateDestinationCheckbox(false);
-            // GUILayout.Space(5);
-            //
-            // // ボタン作成
-            // using (new EditorGUILayout.HorizontalScope())
-            // {
-            //     GUILayout.FlexibleSpace();
-            //     CreateSelectButton(false);
-            //     GUILayout.Space(5);
-            //     CreateReleaseButton(false);
-            // }
-            // GUILayout.Space(10);
 
-
+            // キーイベント
             if (m_KeyEvent.IsEscapeKey())
             {
                 ResetSelect();
             }
 
-            if (m_KeyEvent.IsFocusDelete(GUIUtility.hotControl))
+            if (m_KeyEvent.IsFocusDelete(out PlateauSandboxElectricPost post))
             {
-                TryReleaseWire(true);
-                TryReleaseWire(false);
+                m_Target.RemoveConnectedPost(post);
+                post.RemoveConnectedPost(m_Target);
                 ResetSelect();
             }
+        }
+
+        private void SelectingPost(bool isSelecting, int count)
+        {
+
+
+            m_Context.SetSelectingPost(post, false);
+            m_Context.OnSelected.Invoke();
         }
 
         private void ResetSelect()
@@ -187,11 +95,6 @@ namespace PlateauToolkit.Sandbox.Editor
 
             m_Context.OnCancel.Invoke();
         }
-        //
-        // private void SelectedPost(PlateauSandboxElectricPost targetPost)
-        // {
-        //     ResetSelect();
-        // }
 
         private void SetActiveTool()
         {
@@ -261,25 +164,6 @@ namespace PlateauToolkit.Sandbox.Editor
         //         ResetSelect();
         //     }
         // }
-
-        private void TryReleaseWire(bool isFront)
-        {
-            if (isFront)
-            {
-                if (m_Target.FrontConnectedPost.target != null)
-                {
-                    m_Target.FrontConnectedPost.target.RemoveConnectedPost(m_Target);
-                    m_Target.RemoveConnectedPost(m_Target.FrontConnectedPost.target);
-                }
-            }
-            else
-            {
-                if (m_Target.BackConnectedPost.target != null)
-                {
-                    m_Target.BackConnectedPost.target.RemoveConnectedPost(m_Target);
-                    m_Target.RemoveConnectedPost(m_Target.BackConnectedPost.target);
-                }
-            }
         }
     }
 }
