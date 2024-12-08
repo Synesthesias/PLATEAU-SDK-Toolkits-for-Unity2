@@ -64,7 +64,7 @@ namespace PlateauToolkit.Sandbox.Editor
                     GUILayout.FlexibleSpace();
                     DrawSelectButton(count);
                     GUILayout.Space(5);
-                    DrawDeleteButton();
+                    DrawDeleteButton(count, selectingPost);
                 }
                 GUILayout.Space(5);
             }
@@ -99,6 +99,11 @@ namespace PlateauToolkit.Sandbox.Editor
 
         public PlateauSandboxElectricPost DrawConnectedPost(int count, PlateauSandboxElectricPost target)
         {
+            if (target != null)
+            {
+                m_KeyEvent.TryAddFocusPost(target, count);
+            }
+
             // 接続先の電柱
             var selectedPost = EditorGUILayout.ObjectField(
                             "",
@@ -110,16 +115,9 @@ namespace PlateauToolkit.Sandbox.Editor
                 OnDirectSelect.Invoke(selectedPost);
             }
 
-            if (m_KeyEvent.IsFocusDelete(GUIUtility.hotControl))
-            {
-                // Deleteされた時に該当のオブジェクト選択されたいたときは接続解除
-                m_Own.RemoveConnectedPost(selectedPost);
-            }
-
             return selectedPost;
         }
 
-        bool m_IsFrontSelect = false;
         private void DrawIsConnectedFront(PlateauSandboxElectricPost target, bool isFront)
         {
             // 接続先が正面かどうか
@@ -159,7 +157,7 @@ namespace PlateauToolkit.Sandbox.Editor
             }
         }
 
-        private void DrawDeleteButton()
+        private void DrawDeleteButton(int count, PlateauSandboxElectricPost post)
         {
             if (new PlateauToolkitImageButtonGUI(
                     100,
@@ -168,6 +166,7 @@ namespace PlateauToolkit.Sandbox.Editor
                     false)
                 .Button("削除する"))
             {
+                m_KeyEvent.RemoveFocusPost(post, count);
                 // m_Own.RemoveConnectedPost();
             }
         }

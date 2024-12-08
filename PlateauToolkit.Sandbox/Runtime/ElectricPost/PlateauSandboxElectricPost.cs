@@ -240,12 +240,6 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            // すでに他の電線が接続されていれば、接続を解除
-            if (m_Info.FrontConnectedPost.target != null)
-            {
-                m_Info.FrontConnectedPost.target.RemoveConnectedPost(this);
-            }
-
             m_Info.SetFrontConnect(other, isOtherFront);
 
             // 他の電柱にも接続を通知

@@ -9,49 +9,6 @@ using UnityEngine;
 
 namespace PlateauToolkit.Sandbox.Editor
 {
-    public struct PlateauSandboxElectricPostKeyEvent
-    {
-        private EventType keyEventType;
-        private KeyCode keyCode;
-        private (int id, PlateauSandboxElectricPost post) focusPost;
-
-        public void SetFocusPost(int controlID, PlateauSandboxElectricPost post)
-        {
-            focusPost = (controlID, post);
-        }
-
-        private void SetKeyEvent()
-        {
-            keyEventType = Event.current.type;
-            keyCode = Event.current.keyCode;
-        }
-
-        public bool IsFocusDelete(int controlID)
-        {
-            GUI.GetNameOfFocusedControl()
-
-            if (focusPost.post == null)
-            {
-                return false;
-            }
-
-            SetKeyEvent();
-            return focusControlID == GUIUtility.hotControl && IsDeleteKey();
-        }
-
-        public bool IsDeleteKey()
-        {
-            SetKeyEvent();
-            return keyEventType == EventType.KeyDown && keyCode == KeyCode.Delete;
-        }
-
-        public bool IsEscapeKey()
-        {
-            SetKeyEvent();
-            return keyEventType == EventType.KeyDown && keyCode == KeyCode.Escape;
-        }
-    }
-
     [CustomEditor(typeof(PlateauSandboxElectricPost))]
     public class PlateauSandboxElectricPostInspector : UnityEditor.Editor
     {
@@ -166,10 +123,9 @@ namespace PlateauToolkit.Sandbox.Editor
                 ResetSelect();
             }
 
-            if (m_KeyEvent.IsFocusDelete(GUIUtility.hotControl))
+            if (m_KeyEvent.IsFocusDelete(out PlateauSandboxElectricPost post))
             {
-                TryReleaseWire(true);
-                TryReleaseWire(false);
+                m_Target.RemoveConnectedPost(post);
                 ResetSelect();
             }
         }
