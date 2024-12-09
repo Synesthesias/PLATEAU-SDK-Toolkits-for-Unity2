@@ -23,7 +23,16 @@ namespace PlateauToolkit.Sandbox.Editor
 
         public void RemoveFocusPost(PlateauSandboxElectricPost post, int count)
         {
+            if (post == null)
+            {
+                return;
+            }
+
             string controlKey = $"{post.name}_{count}";
+            if (!focusKeys.Exists(x => x.focusKey == controlKey))
+            {
+                return;
+            }
             focusKeys.RemoveAll(x => x.focusKey == controlKey);
         }
 

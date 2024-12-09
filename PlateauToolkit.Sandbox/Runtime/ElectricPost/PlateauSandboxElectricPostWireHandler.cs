@@ -45,6 +45,11 @@ namespace PlateauToolkit.Sandbox.Runtime
 
         public void ShowToTarget(bool isOwnFront, PlateauSandboxElectricPost targetPost, bool isTargetFront)
         {
+            if (targetPost == null)
+            {
+                return;
+            }
+
             foreach (var postWire in m_PostWires)
             {
                 if (postWire.IsFrontWire != isOwnFront)

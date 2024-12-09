@@ -15,19 +15,19 @@ namespace PlateauToolkit.Sandbox.Editor
     {
         public PlateauSandboxElectricPostConnectionGUI(PlateauSandboxElectricPost own, bool isFront, PlateauSandboxElectricPostKeyEvent keyEvent)
         {
+            m_Context = PlateauSandboxElectricPostContext.GetCurrent();
             m_Own = own;
             m_IsFront = isFront;
             m_KeyEvent = keyEvent;
         }
+        private PlateauSandboxElectricPostContext m_Context;
         private PlateauSandboxElectricPost m_Own;
         private PlateauSandboxElectricPostKeyEvent m_KeyEvent;
         private bool m_IsFront;
-        private bool m_IsPostSelecting; // 選択中かどうか
-
-        private Dictionary<int, bool> m_IsOpen = new ();
+        private int m_SelectingIndex = -1;
 
         public UnityEvent<PlateauSandboxElectricPost> OnDirectSelect = new ();
-        public UnityEvent<bool, int> OnClickSelect = new ();
+        public UnityEvent<bool> OnClickSelect = new ();
         // public UnityEvent OnClickDelete = new ();
 
         public UnityEvent<int> OnFocusObject = new ();
@@ -42,31 +42,36 @@ namespace PlateauToolkit.Sandbox.Editor
             DrawTitle();
 
             // 接続先の電柱
-            int count = 0;
-            foreach (var connectedPost in connectedPosts)
+            if (connectedPosts != null)
             {
-                GUILayout.Space(5);
-                count++;
-
-                PlateauSandboxElectricPost selectingPost = null;
-
-                selectingPost = DrawConnectedPost(count, connectedPost.target);
-                GUILayout.Space(5);
-                using (new EditorGUILayout.HorizontalScope())
+                var drawPosts = new List<(PlateauSandboxElectricPost target, bool isFront)>(connectedPosts);
+                int count = 0;
+                foreach (var connectedPost in drawPosts)
                 {
-                    DrawIsConnectedFront(selectingPost);
-                }
+                    PlateauSandboxElectricPost selectingPost = null;
 
-                GUILayout.Space(5);
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-                    DrawSelectButton(count);
                     GUILayout.Space(5);
-                    DrawDeleteButton(count, selectingPost);
+                    selectingPost = DrawConnectedPost(count, connectedPost.target);
+                    GUILayout.Space(5);
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        DrawIsConnectedFront(selectingPost);
+                    }
+
+                    GUILayout.Space(5);
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        DrawSelectButton(count);
+                        GUILayout.Space(5);
+                        DrawDeleteButton(count, selectingPost);
+                    }
+
+                    GUILayout.Space(5);
+
+                    count++;
                 }
-                GUILayout.Space(5);
             }
 
             // 追加ボタン
@@ -84,17 +89,6 @@ namespace PlateauToolkit.Sandbox.Editor
         {
             // タイトル
             EditorGUILayout.LabelField(m_IsFront ? "前方接続部" : "後方接続部", EditorStyles.boldLabel);
-        }
-
-        public bool DrawFoldout(int count)
-        {
-            // 折りたたみ
-            bool isOpen = false;
-            m_IsOpen.TryGetValue(count, out isOpen);
-            bool opened = EditorGUILayout.Foldout(isOpen, $"接続先 {count}");
-            m_IsOpen[count] = opened;
-
-            return opened;
         }
 
         public PlateauSandboxElectricPost DrawConnectedPost(int count, PlateauSandboxElectricPost target)
@@ -135,38 +129,28 @@ namespace PlateauToolkit.Sandbox.Editor
 
         private void DrawSelectButton(int count)
         {
+            bool isSelect = count == m_SelectingIndex;
             if (new PlateauToolkitImageButtonGUI(
                     100,
                     20,
-                    m_IsPostSelecting ? PlateauToolkitGUIStyles.k_ButtonCancelColor : PlateauToolkitGUIStyles.k_ButtonNormalColor,
+                    isSelect ? PlateauToolkitGUIStyles.k_ButtonCancelColor : PlateauToolkitGUIStyles.k_ButtonNormalColor,
                     false)
                 .Button("選択する"))
             {
                 // 選択時
-                if (!m_IsPostSelecting)
+                if (!isSelect)
                 {
                     // ワイヤーを外す
                     m_Own.TryReleaseWire(m_IsFront, count);
-
-                    // SetActiveTool();
-                    //
-                    // // 選択中の状態にする
-                    // m_Context.SetSelectingPost(m_Target, isFront);
-                    //
-                    // if (isFront)
-                    // {
-                    //     m_IsFrontNodeSelecting = true;
-                    // }
-                    // else
-                    // {
-                    //     m_IsBackNodeSelecting = true;
-                    // }
+                    m_SelectingIndex = count;
+                    m_Context.SetSelectingPost(m_Own, m_IsFront, count);
                 }
                 else
                 {
-                    // ResetSelect();
+                    m_SelectingIndex = -1;
+                    m_Context.ResetSelect();
                 }
-                OnClickSelect.Invoke(m_IsPostSelecting, count);
+                OnClickSelect.Invoke(m_SelectingIndex >= 0);
             }
         }
 
@@ -195,13 +179,13 @@ namespace PlateauToolkit.Sandbox.Editor
                 .Button("追加する"))
             {
                 // 追加
-                m_Own.AddConnection(m_IsFront);
+                m_Own.AddConnectionSpace(m_IsFront);
             }
         }
 
         public void Reset()
         {
-            m_IsPostSelecting = false;
+            m_SelectingIndex = -1;
         }
     }
 

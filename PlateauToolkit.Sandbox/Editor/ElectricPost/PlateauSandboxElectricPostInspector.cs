@@ -41,7 +41,7 @@ namespace PlateauToolkit.Sandbox.Editor
             if (m_BackConnectionGUI == null)
             {
                 m_BackConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, false, m_KeyEvent);
-                m_BackConnectionGUI.OnClickSelect.AddListener(() => SelectedPost(m_Target.BackConnectedPost.target));
+                m_BackConnectionGUI.OnClickSelect.AddListener(SelectingPost);
                 // m_BackConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(false));
                 // m_BackConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetBackConnectPointToFacing(post));
             }
@@ -74,12 +74,17 @@ namespace PlateauToolkit.Sandbox.Editor
             }
         }
 
-        private void SelectingPost(bool isSelecting, int count)
+        private void SelectingPost(bool isSelecting)
         {
-
-
-            m_Context.SetSelectingPost(post, false);
-            m_Context.OnSelected.Invoke();
+            if (isSelecting)
+            {
+                // 選択中状態に
+                SetActiveTool();
+            }
+            else
+            {
+                ResetSelect();
+            }
         }
 
         private void ResetSelect()
@@ -88,8 +93,6 @@ namespace PlateauToolkit.Sandbox.Editor
             Event.current.Use();
 
             ToolManager.RestorePreviousPersistentTool();
-            m_Context.SetSelectingPost(null, false);
-
             m_FrontConnectionGUI.Reset();
             m_BackConnectionGUI.Reset();
 
@@ -106,64 +109,6 @@ namespace PlateauToolkit.Sandbox.Editor
             {
                 ToolManager.RestorePreviousPersistentTool();
             }
-        }
-
-        // private void CreateSelectButton(bool isFront)
-        // {
-        //     bool isSelecting = isFront ? m_IsFrontNodeSelecting : m_IsBackNodeSelecting;
-        //
-        //     if (new PlateauToolkitImageButtonGUI(
-        //             100,
-        //             20,
-        //             isSelecting ? PlateauToolkitGUIStyles.k_ButtonCancelColor : PlateauToolkitGUIStyles.k_ButtonNormalColor,
-        //             false)
-        //         .Button("選択する"))
-        //     {
-        //         // 選択時
-        //         if (!isSelecting)
-        //         {
-        //             // ワイヤーを外す
-        //             TryReleaseWire(isFront);
-        //             SetActiveTool();
-        //
-        //             // 選択中の状態にする
-        //             m_Context.SetSelectingPost(m_Target, isFront);
-        //
-        //             if (isFront)
-        //             {
-        //                 m_IsFrontNodeSelecting = true;
-        //             }
-        //             else
-        //             {
-        //                 m_IsBackNodeSelecting = true;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             ResetSelect();
-        //         }
-        //     }
-        // }
-        //
-        // private void CreateReleaseButton(bool isFront)
-        // {
-        //     bool isConnected = isFront ? m_Target.FrontConnectedPost.target != null : m_Target.BackConnectedPost.target != null;
-        //
-        //     if (new PlateauToolkitImageButtonGUI(
-        //             100,
-        //             20,
-        //             isConnected ? PlateauToolkitGUIStyles.k_ButtonPrimaryColor : PlateauToolkitGUIStyles.k_ButtonDisableColor,
-        //             false)
-        //         .Button("解除する"))
-        //     {
-        //         if (!isConnected)
-        //         {
-        //             return;
-        //         }
-        //         TryReleaseWire(isFront);
-        //         ResetSelect();
-        //     }
-        // }
         }
     }
 }
