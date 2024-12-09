@@ -1,3 +1,4 @@
+using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,12 +24,20 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
         private const float k_EntranceWindowHeight = 2.5f;
         private const float k_MinSkyscraperCondominiumWallWidthOffset = 1.25f;
         private const float k_SkyscraperCondominiumWindowFrameRodHeight = 0.05f;
+        private const int   k_RoundDigit = 3;
 
         private readonly Dictionary<PanelType, List<Func<ILayoutElement>>> m_Constructors = new();
         private readonly Dictionary<PanelSize, float> m_SizeValues = new()
         {
             {PanelSize.k_Narrow, 2.5f},
         };
+
+        private int m_NumFloorWithoutEntrance;
+        private int m_NumHigherFloor;
+        private int m_NumLowerFloorWithoutEntrance;
+        private float m_FloorHeight;
+        private float m_HigherFloorHeight;
+        private float m_LowerFloorHeight;
 
         private ComplexBuildingConfig.ComplexBuildingType GetComplexBuildingType (BuildingGenerator.Config config)
         {
@@ -56,19 +65,50 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 bool leftIsConvex = Geometry.GetAngle(b, a, aNext) <= 180;
                 bool rightIsConvex = Geometry.GetAngle(bPrevious, b, a) <= 180;
 
-                // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める
-                float floorHeight = 0;
+                // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める（壁のように大きさで形状が決まらない時に利用）
                 float floorHeightRemaining = 1f;
                 for (float tempFloorHeight = k_MinFloorHeight; tempFloorHeight < k_MaxFloorHeight;)
                 {
                     float numFloor = config.buildingHeight / tempFloorHeight;
                     if (numFloor - Mathf.Floor(numFloor) < floorHeightRemaining)
                     {
-                        floorHeight = tempFloorHeight;
+                        m_FloorHeight = tempFloorHeight;
                         floorHeightRemaining = numFloor - Mathf.Floor(numFloor);
                     }
                     tempFloorHeight += 0.05f;
                 }
+
+                // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める（窓のように大きさで形状が変更される時に利用）
+                float higherFloorHeightRemaining = 1f;
+                for (float tempFloorHeight = k_MinFloorHeight; tempFloorHeight < k_MaxFloorHeight;)
+                {
+                    float numFloor = (config.buildingHeight - config.complexBuildingParams.buildingBoundaryHeight - k_DepressionWallHeight) / tempFloorHeight;
+                    if (numFloor - Mathf.Floor(numFloor) < higherFloorHeightRemaining)
+                    {
+                        m_HigherFloorHeight = tempFloorHeight;
+                        higherFloorHeightRemaining = numFloor - Mathf.Floor(numFloor);
+                    }
+                    tempFloorHeight += 0.05f;
+                }
+
+                // 小数点が最も小さい（フロア数を求めた時に最も正確に割り切れるかを表す）フロア数から最大のフロア高を求める（窓のように大きさで形状が変更される時に利用）
+                float lowerFloorHeightRemaining = 1f;
+                for (float tempFloorHeight = k_MinFloorHeight; tempFloorHeight < k_MaxFloorHeight;)
+                {
+                    float buildingHeight = Math.Min(config.complexBuildingParams.buildingBoundaryHeight, config.buildingHeight);
+                    float numFloor = buildingHeight / tempFloorHeight;
+                    if (numFloor - Mathf.Floor(numFloor) < lowerFloorHeightRemaining)
+                    {
+                        m_LowerFloorHeight = tempFloorHeight;
+                        lowerFloorHeightRemaining = numFloor - Mathf.Floor(numFloor);
+                    }
+                    tempFloorHeight += 0.05f;
+                }
+
+                m_NumFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / m_FloorHeight) - 1;
+                m_NumHigherFloor = Math.Max(0, (int)Mathf.Floor((config.buildingHeight - config.complexBuildingParams.buildingBoundaryHeight - k_DepressionWallHeight) / m_HigherFloorHeight));
+                m_NumLowerFloorWithoutEntrance = Math.Max(0, (int)Mathf.Floor(config.complexBuildingParams.buildingBoundaryHeight / m_LowerFloorHeight) - 1);
+                Debug.Log($"m_NumFloor: {m_NumFloorWithoutEntrance} numHigherFloor: {m_NumHigherFloor} numLowerFloor: {m_NumLowerFloorWithoutEntrance} m_FloorHeight: {m_FloorHeight} higherFloorHeight: {m_HigherFloorHeight} lowerFloorHeight: {m_LowerFloorHeight}");
 
                 config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
                 switch (i)
@@ -78,7 +118,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Back;
                         var vertical = new VerticalLayout();
                         vertical.AddElement(Construct(m_Constructors[PanelType.k_ShadowWall], width - k_ShadowWallOffset, config.buildingHeight - k_ShadowWallOffset));
-                        vertical.Add(PlanNormalFacade(width, floorHeight,　config, leftIsConvex, rightIsConvex));
+                        vertical.Add(PlanNormalFacade(width, config, leftIsConvex, rightIsConvex));
                         layouts.Add(vertical);
                         break;
                     }
@@ -87,7 +127,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Right;
                         var vertical = new VerticalLayout();
                         vertical.AddElement(Construct(m_Constructors[PanelType.k_ShadowWall], width - k_ShadowWallOffset, config.buildingHeight - k_ShadowWallOffset));
-                        vertical.Add(PlanNormalFacade(width, floorHeight,　config, leftIsConvex, rightIsConvex));
+                        vertical.Add(PlanNormalFacade(width, config, leftIsConvex, rightIsConvex));
                         layouts.Add(vertical);
                         break;
                     }
@@ -96,7 +136,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Front;
                         var vertical = new VerticalLayout();
                         vertical.AddElement(Construct(m_Constructors[PanelType.k_ShadowWall], width - k_ShadowWallOffset, config.buildingHeight - k_ShadowWallOffset));
-                        vertical.Add(PlanEntranceFacade(width, floorHeight,　config, leftIsConvex, rightIsConvex));
+                        vertical.Add(PlanEntranceFacade(width, config, leftIsConvex, rightIsConvex));
                         layouts.Add(vertical);
                         break;
                     }
@@ -105,7 +145,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         config.faceDirection = BuildingGenerator.Config.FaceDirection.k_Left;
                         var vertical = new VerticalLayout();
                         vertical.AddElement(Construct(m_Constructors[PanelType.k_ShadowWall], width - k_ShadowWallOffset, config.buildingHeight - k_ShadowWallOffset));
-                        vertical.Add(PlanNormalFacade(width, floorHeight,　config, leftIsConvex, rightIsConvex));
+                        vertical.Add(PlanNormalFacade(width, config, leftIsConvex, rightIsConvex));
                         layouts.Add(vertical);
                         break;
                     }
@@ -233,73 +273,19 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             };
         }
 
-        private ILayout PlanNormalFacade(float facadeWidth, float floorHeight, BuildingGenerator.Config config, bool leftIsConvex, bool rightIsConvex)
-        {
-            List<PanelSize> panelSizes = DivideFacade(facadeWidth, leftIsConvex, rightIsConvex, out float remainderWidth);
-            return CreateNormalFacadeVertical(panelSizes, remainderWidth, floorHeight, 0, panelSizes.Count, config);
-        }
-
-        private ILayout PlanEntranceFacade(float facadeWidth, float floorHeight, BuildingGenerator.Config config, bool leftIsConvex, bool rightIsConvex)
+        private ILayout PlanEntranceFacade(float facadeWidth, BuildingGenerator.Config config, bool leftIsConvex, bool rightIsConvex)
         {
             List<PanelSize> panelSizes = DivideFacade(facadeWidth, leftIsConvex, rightIsConvex, out float remainderWidth);
             var horizontal = new HorizontalLayout();
             const int entranceCount = 1;
             int entranceIndexInterval = (panelSizes.Count - entranceCount)/(entranceCount + 1);
             float floorWidthOffset = remainderWidth / panelSizes.Count;
-            horizontal.Add(CreateEntranceVertical(panelSizes, remainderWidth, floorWidthOffset, floorHeight, entranceIndexInterval, 0 == entranceIndexInterval, entranceIndexInterval + 1 == panelSizes.Count, config));
+            horizontal.Add(CreateEntranceVertical(panelSizes, remainderWidth, floorWidthOffset, entranceIndexInterval, 0 == entranceIndexInterval, entranceIndexInterval + 1 == panelSizes.Count, config));
 
             return horizontal;
         }
 
-        private VerticalLayout CreateNormalFacadeVertical(List<PanelSize> panelSizes, float remainderWidth, float floorHeight, int from, int to, BuildingGenerator.Config config)
-        {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
-            float floorWidthOffset = remainderWidth / (to - from);
-            ComplexBuildingConfig.ComplexBuildingType complexBuildingType = GetComplexBuildingType(config);
-            var vertical = new VerticalLayout();
-            switch (complexBuildingType)
-            {
-                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
-                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWall]));
-                    break;
-                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
-                {
-                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_OfficeFullWindow]));
-                    float remainingHeight = config.buildingHeight - entranceHeight;
-                    float currentHeight = entranceHeight;
-                    vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, floorHeight, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, from, to, config));
-                    break;
-                }
-                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
-                {
-                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialFullWindow]));
-                    float remainingHeight = config.buildingHeight - entranceHeight;
-                    float currentHeight = entranceHeight;
-                    if (0 < remainingHeight - k_SmallWallHeight)
-                    {
-                        remainingHeight -= k_SmallWallHeight;
-                        currentHeight += k_SmallWallHeight;
-                        vertical.Add(CreateHorizontal(panelSizes, from, to, k_SmallWallHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
-                        if (0 < remainingHeight - k_DepressionWallHeight)
-                        {
-                            remainingHeight -= k_DepressionWallHeight;
-                            currentHeight += k_DepressionWallHeight;
-                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, true, config));
-                        }
-                    }
-
-                    vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, floorHeight, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, from, to, config));
-                    break;
-                }
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return vertical;
-        }
-
-        private HorizontalLayout CreateEntranceVertical(List<PanelSize> panelSizes, float remainderWidth, float floorWidthOffset, float floorHeight, int entranceIndexInterval, bool noLeftLayout, bool noRightLayout, BuildingGenerator.Config config)
+        private HorizontalLayout CreateEntranceVertical(List<PanelSize> panelSizes, float remainderWidth, float floorWidthOffset, int entranceIndexInterval, bool noLeftLayout, bool noRightLayout, BuildingGenerator.Config config)
         {
             ComplexBuildingConfig.ComplexBuildingType complexBuildingType = GetComplexBuildingType(config);
             var horizontal = new HorizontalLayout();
@@ -307,27 +293,27 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             {
                 case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateSkyscraperCondominiumEntranceVertical(panelSizes, remainderWidth, floorWidthOffset, floorHeight, entranceIndexInterval, config));
+                    horizontal.Add(CreateSkyscraperCondominiumEntranceVertical(panelSizes, remainderWidth, floorWidthOffset, entranceIndexInterval, config));
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * entranceIndexInterval, floorHeight, 0, entranceIndexInterval, config));
+                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * entranceIndexInterval, 0, entranceIndexInterval, config));
 
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateOfficeEntranceVertical(panelSizes, floorWidthOffset, floorHeight, entranceIndexInterval, config));
+                    horizontal.Add(CreateOfficeEntranceVertical(panelSizes, floorWidthOffset, entranceIndexInterval, config));
 
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * (panelSizes.Count - entranceIndexInterval - 1), floorHeight, entranceIndexInterval + 1, panelSizes.Count, config));
+                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * (panelSizes.Count - entranceIndexInterval - 1), entranceIndexInterval + 1, panelSizes.Count, config));
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * entranceIndexInterval, floorHeight, 0, entranceIndexInterval, config));
+                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * entranceIndexInterval, 0, entranceIndexInterval, config));
 
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateCommercialEntranceVertical(panelSizes, floorWidthOffset, floorHeight, entranceIndexInterval, noLeftLayout, noRightLayout, config));
+                    horizontal.Add(CreateCommercialEntranceVertical(panelSizes, floorWidthOffset, entranceIndexInterval, noLeftLayout, noRightLayout, config));
 
                     config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = false;
-                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * (panelSizes.Count - entranceIndexInterval - 1), floorHeight, entranceIndexInterval + 1, panelSizes.Count, config));
+                    horizontal.Add(CreateNormalFacadeVertical(panelSizes, floorWidthOffset * (panelSizes.Count - entranceIndexInterval - 1), entranceIndexInterval + 1, panelSizes.Count, config));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -336,10 +322,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             return horizontal;
         }
 
-        private VerticalLayout CreateSkyscraperCondominiumEntranceVertical(List<PanelSize> panelSizes, float remainderWidth, float floorWidthOffset, float floorHeight, int entranceIndexInterval, BuildingGenerator.Config config)
+        private VerticalLayout CreateSkyscraperCondominiumEntranceVertical(List<PanelSize> panelSizes, float remainderWidth, float floorWidthOffset, int entranceIndexInterval, BuildingGenerator.Config config)
         {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
+            float entranceHeight = config.complexBuildingParams.buildingBoundaryHeight <= config.buildingHeight ? config.complexBuildingParams.buildingBoundaryHeight - m_NumLowerFloorWithoutEntrance * m_LowerFloorHeight : config.buildingHeight - m_NumFloorWithoutEntrance * m_FloorHeight;
             float wallWidthOffset = Mathf.Max(k_MinSkyscraperCondominiumWallWidthOffset, remainderWidth);
             float wallAveWidthOffset = wallWidthOffset / panelSizes.Count;
             var vertical = new VerticalLayout();
@@ -369,16 +354,15 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             float currentHeight = entranceHeight;
             if (0 < remainingHeight)
             {
-                vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, floorHeight, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
+                vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
             }
 
             return vertical;
         }
 
-        private VerticalLayout CreateOfficeEntranceVertical(List<PanelSize> panelSizes, float floorWidthOffset, float floorHeight, int entranceIndexInterval, BuildingGenerator.Config config)
+        private VerticalLayout CreateOfficeEntranceVertical(List<PanelSize> panelSizes, float floorWidthOffset, int entranceIndexInterval, BuildingGenerator.Config config)
         {
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
+            float entranceHeight = config.complexBuildingParams.buildingBoundaryHeight <= config.buildingHeight ? config.complexBuildingParams.buildingBoundaryHeight - m_NumLowerFloorWithoutEntrance * m_LowerFloorHeight : config.buildingHeight - m_NumFloorWithoutEntrance * m_FloorHeight;
             var vertical = new VerticalLayout
             {
                 Construct(new List<Func<ILayoutElement>>
@@ -401,12 +385,12 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
 
             float remainingHeight = config.buildingHeight - entranceHeight;
             float currentHeight = entranceHeight;
-            vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, floorHeight, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
+            vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
 
             return vertical;
         }
 
-        private VerticalLayout CreateCommercialEntranceVertical(List<PanelSize> panelSizes, float floorWidthOffset, float floorHeight, int entranceIndexInterval, bool noLeftLayout, bool noRightLayout, BuildingGenerator.Config config)
+        private VerticalLayout CreateCommercialEntranceVertical(List<PanelSize> panelSizes, float floorWidthOffset, int entranceIndexInterval, bool noLeftLayout, bool noRightLayout, BuildingGenerator.Config config)
         {
             ProceduralFacadeElement.PositionType positionType = noLeftLayout switch
             {
@@ -416,8 +400,8 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 _ => ProceduralFacadeElement.PositionType.k_Middle
             };
 
-            int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / floorHeight) - 1;
-            float entranceHeight = config.buildingHeight - numFloorWithoutEntrance * floorHeight;
+            float entranceHeight = config.complexBuildingParams.buildingBoundaryHeight <= config.buildingHeight ? config.complexBuildingParams.buildingBoundaryHeight - m_NumLowerFloorWithoutEntrance * m_LowerFloorHeight : config.buildingHeight - m_NumFloorWithoutEntrance * m_FloorHeight;
+            entranceHeight = (float)Math.Round(entranceHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
             var vertical = new VerticalLayout
             {
                 Construct(new List<Func<ILayoutElement>>
@@ -452,91 +436,325 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                     vertical.Add(Construct(() => new ProceduralFacadeCompoundElements.ProceduralDepressionWall(config, positionType), m_SizeValues[panelSizes[entranceIndexInterval]] + floorWidthOffset, k_DepressionWallHeight));
                 }
             }
-            vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, floorHeight, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
+            vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, entranceIndexInterval, entranceIndexInterval + 1, config));
 
             return vertical;
         }
 
-        private VerticalLayout CreateNormalFacadeVerticalIter(List<PanelSize> panelSizes, float floorHeight, float remainingHeight, float currentHeight, float floorWidthOffset, float entranceHeight, int from, int to, BuildingGenerator.Config config)
+        private ILayout PlanNormalFacade(float facadeWidth, BuildingGenerator.Config config, bool leftIsConvex, bool rightIsConvex)
+        {
+            List<PanelSize> panelSizes = DivideFacade(facadeWidth, leftIsConvex, rightIsConvex, out float remainderWidth);
+            return CreateNormalFacadeVertical(panelSizes, remainderWidth, 0, panelSizes.Count, config);
+        }
+
+        private VerticalLayout CreateNormalFacadeVertical(List<PanelSize> panelSizes, float remainderWidth, int from, int to, BuildingGenerator.Config config)
         {
             var vertical = new VerticalLayout();
-            int apartmentFloorIndex = 0;
-            int officeFloorIndex = 0;
-            int commercialFloorIndex = 0;
-            bool addedBoundaryWall = false;
-            if (0 < remainingHeight)
+            float entranceHeight = config.complexBuildingParams.buildingBoundaryHeight <= config.buildingHeight ? config.complexBuildingParams.buildingBoundaryHeight - m_NumLowerFloorWithoutEntrance * m_LowerFloorHeight : config.buildingHeight - m_NumFloorWithoutEntrance * m_FloorHeight;
+            entranceHeight = (float)Math.Round(entranceHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+            float floorWidthOffset = remainderWidth / (to - from);
+            floorWidthOffset = (float)Math.Round(floorWidthOffset, k_RoundDigit, MidpointRounding.AwayFromZero);
+
+            ComplexBuildingConfig.ComplexBuildingType complexBuildingType = GetComplexBuildingType(config);
+            switch (complexBuildingType)
             {
-                while (0 < remainingHeight)
+                case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
                 {
-                    ComplexBuildingConfig.ComplexBuildingType complexBuildingType = GetComplexBuildingType(config);
-                    (int, bool, float, float) tupleData;
-                    switch (complexBuildingType)
-                    {
-                        case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
-                            tupleData = CreateBuildingPlanner(vertical, complexBuildingType, apartmentFloorIndex, addedBoundaryWall, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
-                            apartmentFloorIndex = tupleData.Item1;
-                            break;
-                        case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
-                            tupleData = CreateBuildingPlanner(vertical, complexBuildingType, officeFloorIndex, addedBoundaryWall, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
-                            officeFloorIndex = tupleData.Item1;
-                            break;
-                        case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
-                            tupleData = CreateBuildingPlanner(vertical, complexBuildingType, commercialFloorIndex, addedBoundaryWall, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
-                            commercialFloorIndex = tupleData.Item1;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                    addedBoundaryWall = tupleData.Item2;
-                    currentHeight = tupleData.Item3;
-                    remainingHeight = tupleData.Item4;
+                    float buildingHeight = Math.Min(config.complexBuildingParams.buildingBoundaryHeight, config.buildingHeight);
+                    int numFloorWithoutEntrance = (int)Mathf.Floor(buildingHeight / m_LowerFloorHeight) - 1;
+                    entranceHeight = buildingHeight - numFloorWithoutEntrance * m_LowerFloorHeight;
+                    entranceHeight = (float)Math.Round(entranceHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWall]));
+                    float remainingHeight = config.buildingHeight - entranceHeight;
+                    float currentHeight = entranceHeight;
+                    remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                    currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+
+                    // Debug.Log($"numLowerFloorWithoutEntrance: {numLowerFloorWithoutEntrance} numfloorWithoutEntrance: {numFloorWithoutEntrance} config.buildingHeight: {config.buildingHeight} config.complexBuildingParams.buildingBoundaryHeight: {config.complexBuildingParams.buildingBoundaryHeight}");
+                    // Debug.Log($"numfloorWithoutEntrance: {numHigherFloor}");
+
+                    // フロア数が境界線を超えるとnumFloorWithoutEntranceの階数が上部の建物も含むため、下部の建物の階数を採用
+                    // int numLowerFloorWithoutEntrance = (int)Mathf.Floor(config.complexBuildingParams.buildingBoundaryHeight / higherFloorHeight) - 1;
+                    // Debug.Log($"config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall: {config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall}");
+                    // vertical.Add(CreateHorizontal(panelSizes, 0, panelSizes.Count, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWall]));
+
+                    vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, from, to, config));
+                    break;
                 }
+                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
+                {
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_OfficeFullWindow]));
+                    float remainingHeight = config.buildingHeight - entranceHeight;
+                    float currentHeight = entranceHeight;
+                    vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, from, to, config));
+                    break;
+                }
+                case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
+                {
+                    vertical.Add(CreateHorizontal(panelSizes, from, to, entranceHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialFullWindow]));
+                    float remainingHeight = config.buildingHeight - entranceHeight;
+                    float currentHeight = entranceHeight;
+                    if (0 < remainingHeight - k_SmallWallHeight)
+                    {
+                        remainingHeight -= k_SmallWallHeight;
+                        currentHeight += k_SmallWallHeight;
+                        vertical.Add(CreateHorizontal(panelSizes, from, to, k_SmallWallHeight, floorWidthOffset, m_Constructors[PanelType.k_CommercialWallWithFrame]));
+                        if (0 < remainingHeight - k_DepressionWallHeight)
+                        {
+                            remainingHeight -= k_DepressionWallHeight;
+                            currentHeight += k_DepressionWallHeight;
+                            vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, true, config));
+                        }
+                    }
+                    vertical.Add(CreateNormalFacadeVerticalIter(panelSizes, remainingHeight, currentHeight, floorWidthOffset, entranceHeight, from, to, config));
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             return vertical;
         }
 
-        private (int, bool, float, float) CreateBuildingPlanner(VerticalLayout vertical, ComplexBuildingConfig.ComplexBuildingType complexBuildingType, int floorIndex, bool addedBoundaryWall, float floorHeight, float currentHeight, float remainingHeight, List<PanelSize> panelSizes, float floorWidthOffset, float entranceHeight, int from, int to, BuildingGenerator.Config config)
+        private VerticalLayout CreateNormalFacadeVerticalIter(List<PanelSize> panelSizes, float remainingHeight, float currentHeight, float floorWidthOffset, float entranceHeight, int from, int to, BuildingGenerator.Config config)
         {
+            var vertical = new VerticalLayout();
+            int addedLowerFloor = 0;
+            int apartmentFloorIndex = 0;
+            int officeFloorIndex = 0;
+            int commercialFloorIndex = 0;
+            // float originalLowerRemainingHeight = config.complexBuildingParams.buildingBoundaryHeight <= config.buildingHeight ? config.complexBuildingParams.buildingBoundaryHeight - currentHeight : remainingHeight;
+            bool addedBoundaryWall = false;
+            // Debug.Log($"originalLowerRemainingHeight: {originalLowerRemainingHeight} currentHeight: {currentHeight} remainingHeight: {remainingHeight}");
+
+            while (0 < remainingHeight)
+            {
+                bool canAddLowerFloor = ++addedLowerFloor <= m_NumLowerFloorWithoutEntrance;
+                ComplexBuildingConfig.ComplexBuildingType complexBuildingType = GetComplexBuildingType(config);
+                (int, bool, float, float) tupleData;
+                switch (complexBuildingType)
+                {
+                    case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
+                    {
+                        // 窓の高さは残りの高さで割って余りが出ないようにする
+                        if (addedBoundaryWall)
+                        {
+                            // floorHeight = m_NumHigherFloor == 0 ? 0 : (float)Math.Round(m_HigherFloorHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                            // floorHeight = (float)Math.Round(floorHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                            // Debug.Log($"[111] floorHeight: {floorHeight}");
+                            float buildingHeight = config.buildingHeight - config.complexBuildingParams.buildingBoundaryHeight - k_DepressionWallHeight;
+                            int numFloor = (int)Mathf.Floor(buildingHeight / m_HigherFloorHeight);
+
+                            bool hasBalcony = config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Left && config.complexSkyscraperCondominiumBuildingParams.hasBalconyLeft ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Right && config.complexSkyscraperCondominiumBuildingParams.hasBalconyRight ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Front && config.complexSkyscraperCondominiumBuildingParams.hasBalconyFront ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Back && config.complexSkyscraperCondominiumBuildingParams.hasBalconyBack;
+
+                            {
+                                Directions directions = Directions.Down;
+                                if (numFloor == 1)
+                                {
+                                    directions |= Directions.Up;
+                                }
+
+                                if (hasBalcony)
+                                {
+                                    // var horizontal = new HorizontalLayout
+                                    // {
+                                    //     CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall]),
+                                    //     CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
+                                    //     CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall])
+                                    // };
+                                    // vertical.Add(horizontal);
+                                }
+                                else
+                                {
+
+                                    vertical.Add(CreateHorizontal(panelSizes, from, to, m_LowerFloorHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWindow]));
+                                }
+                            }
+
+                            for (int i = 1; i < numFloor; i++)
+                            {
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, m_LowerFloorHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWindow]));
+                            }
+
+                            currentHeight += m_LowerFloorHeight * numFloor;
+                            remainingHeight -= m_LowerFloorHeight * numFloor;
+                            config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
+                            // floorHeight = m_NumLowerFloor == 0 ? 0 : (config.buildingHeight - entranceHeight) / m_LowerFloorHeight;
+                            Debug.Log($"numFloor: {numFloor} currentHeight: {currentHeight} entranceHeight: {entranceHeight} m_LowerFloorHeight: {m_LowerFloorHeight} remainingHeight: {remainingHeight}");
+                            remainingHeight = 0;
+                            // if (config.buildingHeight <= config.complexBuildingParams.buildingBoundaryHeight)
+                            // {
+                            // int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / m_LowerFloorHeight) - 1;
+                            // floorHeight = m_NumLowerFloor == 0 ? 0 : (config.buildingHeight - entranceHeight) / m_LowerFloorHeight;
+                            //     floorHeight =  m_NumLowerFloor == 0 ? 0 : (float)Math.Round(m_LowerFloorHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                            // }
+                            // Debug.Log($"[0] floorHeight: {floorHeight}");
+
+                            // if (config.complexBuildingParams.buildingBoundaryHeight < config.buildingHeight)
+                            // {
+                            //     tupleData = CreateBuildingPlanner(vertical, complexBuildingType, apartmentFloorIndex, addedBoundaryWall, false, false, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
+                            //     currentHeight = tupleData.Item3;
+                            //     remainingHeight = tupleData.Item4;
+                            // }
+                            Debug.Log($"[AAA] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
+                            tupleData = (0, true, currentHeight, remainingHeight);
+                        }
+                        else
+                        {
+                            float buildingHeight = Math.Min(config.complexBuildingParams.buildingBoundaryHeight, config.buildingHeight);
+                            Debug.Log($"buildingHeight: {buildingHeight}");
+                            int numFloorWithoutEntrance = (int)Mathf.Floor(buildingHeight / m_LowerFloorHeight) - 1;
+                            Debug.Log($"numFloorWithoutEntrance: {numFloorWithoutEntrance}");
+
+                            bool hasBalcony = config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Left && config.complexSkyscraperCondominiumBuildingParams.hasBalconyLeft ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Right && config.complexSkyscraperCondominiumBuildingParams.hasBalconyRight ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Front && config.complexSkyscraperCondominiumBuildingParams.hasBalconyFront ||
+                                              config.faceDirection == BuildingGenerator.Config.FaceDirection.k_Back && config.complexSkyscraperCondominiumBuildingParams.hasBalconyBack;
+
+                            {
+                                Directions directions = Directions.Down;
+                                if (numFloorWithoutEntrance == 1)
+                                {
+                                    directions |= Directions.Up;
+                                }
+
+                                if (hasBalcony)
+                                {
+                                    // var horizontal = new HorizontalLayout
+                                    // {
+                                    //     CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall]),
+                                    //     CreateHorizontalBalcony(panelSizes, from, to, floorHeight, floorWidthOffset - wallAveWidthOffset, config, directions),
+                                    //     CreateHorizontal(panelSizes, 0, 1, floorHeight, -k_NarrowPanelSize + wallWidthOffset * 0.5f, m_Constructors[PanelType.k_Wall])
+                                    // };
+                                    // vertical.Add(horizontal);
+                                }
+                                else
+                                {
+                                    vertical.Add(CreateHorizontal(panelSizes, from, to, m_LowerFloorHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWindow]));
+                                    Debug.Log($"Add] m_LowerFloorHeight {m_LowerFloorHeight}");
+                                }
+                            }
+
+                            for (int i = 1; i < numFloorWithoutEntrance; i++)
+                            {
+                                vertical.Add(CreateHorizontal(panelSizes, from, to, m_LowerFloorHeight, floorWidthOffset, m_Constructors[PanelType.k_SkyscraperCondominiumWindow]));
+                            }
+
+                            currentHeight += m_LowerFloorHeight * numFloorWithoutEntrance;
+                            remainingHeight -= m_LowerFloorHeight * numFloorWithoutEntrance;
+                            config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = true;
+                            // floorHeight = m_NumLowerFloor == 0 ? 0 : (config.buildingHeight - entranceHeight) / m_LowerFloorHeight;
+                            Debug.Log($"currentHeight: {currentHeight} entranceHeight: {entranceHeight} m_LowerFloorHeight: {m_LowerFloorHeight} remainingHeight: {remainingHeight}");
+                            // if (config.buildingHeight <= config.complexBuildingParams.buildingBoundaryHeight)
+                            // {
+                            // int numFloorWithoutEntrance = (int)Mathf.Floor(config.buildingHeight / m_LowerFloorHeight) - 1;
+                            // floorHeight = m_NumLowerFloor == 0 ? 0 : (config.buildingHeight - entranceHeight) / m_LowerFloorHeight;
+                            //     floorHeight =  m_NumLowerFloor == 0 ? 0 : (float)Math.Round(m_LowerFloorHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                            // }
+                            // Debug.Log($"[0] floorHeight: {floorHeight}");
+
+                            if (config.complexBuildingParams.buildingBoundaryHeight < config.buildingHeight)
+                            {
+                                tupleData = CreateBuildingPlanner(vertical, complexBuildingType, apartmentFloorIndex, addedBoundaryWall, canAddLowerFloor:false, m_HigherFloorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
+                                currentHeight = tupleData.Item3;
+                                remainingHeight = tupleData.Item4;
+                            }
+                            Debug.Log($"[!!!] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
+                            tupleData = (0, true, currentHeight, remainingHeight);
+                        }
+                        break;
+                    }
+                    case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
+                    {
+                        float floorHeight = addedBoundaryWall ? m_HigherFloorHeight : m_FloorHeight;
+                        tupleData = CreateBuildingPlanner(vertical, complexBuildingType, officeFloorIndex, addedBoundaryWall, canAddLowerFloor: true, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
+                        officeFloorIndex = tupleData.Item1;
+                        break;
+                    }
+                    case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
+                    {
+                        float floorHeight = addedBoundaryWall ? m_HigherFloorHeight : m_FloorHeight;
+                        tupleData = CreateBuildingPlanner(vertical, complexBuildingType, commercialFloorIndex, addedBoundaryWall, canAddLowerFloor: true, floorHeight, currentHeight, remainingHeight, panelSizes, floorWidthOffset, entranceHeight, from, to, config);
+                        commercialFloorIndex = tupleData.Item1;
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                addedBoundaryWall = tupleData.Item2;
+                currentHeight = tupleData.Item3;
+                remainingHeight = tupleData.Item4;
+                Debug.Log($"[■] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
+            }
+
+            return vertical;
+        }
+
+        private (int, bool, float, float) CreateBuildingPlanner(VerticalLayout vertical, ComplexBuildingConfig.ComplexBuildingType complexBuildingType, int floorIndex, bool addedBoundaryWall, bool canAddLowerFloor, float floorHeight, float currentHeight, float remainingHeight, List<PanelSize> panelSizes, float floorWidthOffset, float entranceHeight, int from, int to, BuildingGenerator.Config config)
+        {
+            if (floorHeight <= 0)
+            {
+                return (floorIndex, addedBoundaryWall, currentHeight, remainingHeight);
+            }
+
             PanelType panelType;
             float panelHeight;
             switch (complexBuildingType)
             {
                 case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
-                    panelType = PanelType.k_SkyscraperCondominiumWall;
+                    panelType = floorHeight <= remainingHeight ? PanelType.k_SkyscraperCondominiumWindow : PanelType.k_SkyscraperCondominiumWall;
                     panelHeight = floorHeight;
+                    panelHeight = (float)Math.Round(panelHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                     panelType = floorIndex % 2 == 0 ? PanelType.k_OfficeSmallFullWindow : PanelType.k_OfficeFullWindow;
                     panelHeight = floorIndex % 2 == 0 ? config.complexOfficeBuildingParams.spandrelHeight : entranceHeight;
+                    panelHeight = (float)Math.Round(panelHeight, 2, MidpointRounding.AwayFromZero); // 小数点第二位まで必要
                     break;
                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                     panelType = floorIndex % 4 == 3 ? PanelType.k_CommercialSmallFullWindow : PanelType.k_CommercialWallWithFrame;
                     panelHeight = floorIndex % 4 == 3 ? k_SmallWindowHeight : entranceHeight;
+                    panelHeight = (float)Math.Round(panelHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(complexBuildingType), complexBuildingType, null);
             }
 
-            if (panelHeight < remainingHeight)
+            if (panelHeight <= remainingHeight)
             {
                 // 繋ぎ目未作成で境界線を超える場合
-                if (!addedBoundaryWall && config.complexBuildingParams.buildingBoundaryHeight < currentHeight + panelHeight)
+                currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+
+                Debug.Log($"[★] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
+                if (!addedBoundaryWall && config.complexBuildingParams.buildingBoundaryHeight <= currentHeight + panelHeight)
                 {
                     addedBoundaryWall = true;
 
-                    // 境界線までの高さ分を埋める
-                    float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
-                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
-                    remainingHeight -= remainingLowerBuildingHeight;
-                    currentHeight += remainingLowerBuildingHeight;
+                    if (canAddLowerFloor)
+                    {
+                        // 境界線までの高さ分を埋める
+                        float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                        remainingLowerBuildingHeight = (float)Math.Round(remainingLowerBuildingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                        vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
+                        remainingHeight -= remainingLowerBuildingHeight;
+                        remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                        currentHeight += remainingLowerBuildingHeight;
+                        currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                        Debug.Log("[★] remainingLowerBuildingHeight: " + remainingLowerBuildingHeight);
+                    }
 
-                    if (k_DepressionWallHeight < remainingHeight)
+                    if (k_DepressionWallHeight <= remainingHeight)
                     {
                         // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが大きい
                         vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
                         remainingHeight -= k_DepressionWallHeight;
+                        remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                         currentHeight += k_DepressionWallHeight;
+                        // Debug.Log($"[A] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                     else
                     {
@@ -544,32 +762,45 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, false, config));
                         currentHeight += remainingHeight;
                         remainingHeight = 0;
+                        // Debug.Log($"[B] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                 }
                 else
                 {
                     vertical.Add(CreateHorizontal(panelSizes, from, to, panelHeight, floorWidthOffset, m_Constructors[panelType]));
                     remainingHeight -= panelHeight;
+                    remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                     currentHeight += panelHeight;
+                    // Debug.Log($"[Wall] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                 }
             }
             else
             {
-                if (!addedBoundaryWall && config.complexBuildingParams.buildingBoundaryHeight < currentHeight + remainingHeight)
+                if (!addedBoundaryWall && config.complexBuildingParams.buildingBoundaryHeight <= currentHeight + remainingHeight)
                 {
-                    // 境界線までの高さ分を埋める
-                    float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
-                    vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
-                    remainingHeight -= remainingLowerBuildingHeight;
-                    currentHeight += remainingLowerBuildingHeight;
+                    addedBoundaryWall = true;
 
-                    if (k_DepressionWallHeight < remainingHeight)
+                    if (canAddLowerFloor)
+                    {
+                        // 境界線までの高さ分を埋める
+                        float remainingLowerBuildingHeight = config.complexBuildingParams.buildingBoundaryHeight - currentHeight;
+                        remainingLowerBuildingHeight = (float)Math.Round(remainingLowerBuildingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                        Debug.Log("[★] remainingLowerBuildingHeight: " + remainingLowerBuildingHeight);
+                        vertical.Add(CreateHorizontal(panelSizes, from, to, remainingLowerBuildingHeight, floorWidthOffset, m_Constructors[panelType]));
+                        remainingHeight -= remainingLowerBuildingHeight;
+                        remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                        currentHeight += remainingLowerBuildingHeight;
+                        currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+                    }
+
+                    if (k_DepressionWallHeight <= remainingHeight)
                     {
                         // 境界線の上に配置されるDepressionWallの高さよりもremainingHeightが大きい
-                        addedBoundaryWall = true;
                         vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, k_DepressionWallHeight, floorWidthOffset, false, config));
                         remainingHeight -= k_DepressionWallHeight;
+                        remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                         currentHeight += k_DepressionWallHeight;
+                        // Debug.Log($"[D] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                     else
                     {
@@ -577,15 +808,18 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         vertical.Add(CreateDepressionWallNormalFacadeHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, false, config));
                         currentHeight += remainingHeight;
                         remainingHeight = 0;
+                        Debug.Log($"[E] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                 }
                 else
                 {
-                    if (0 < remainingHeight - panelHeight)
+                    if (panelHeight <= remainingHeight)
                     {
                         vertical.Add(CreateHorizontal(panelSizes, from, to, panelHeight, floorWidthOffset, m_Constructors[panelType]));
                         remainingHeight -= panelHeight;
+                        remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
                         currentHeight += panelHeight;
+                        Debug.Log($"[F] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                     else
                     {
@@ -593,12 +827,17 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         vertical.Add(CreateHorizontal(panelSizes, from, to, remainingHeight, floorWidthOffset, m_Constructors[panelType]));
                         currentHeight += remainingHeight;
                         remainingHeight = 0;
+                        Debug.Log($"[G] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
                     }
                 }
             }
 
             floorIndex++;
             config.m_ComplexBuildingPlannerParams.m_AddedBoundaryWall = addedBoundaryWall;
+            // Debug.Log($"[END1] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
+            currentHeight = (float)Math.Round(currentHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+            remainingHeight = (float)Math.Round(remainingHeight, k_RoundDigit, MidpointRounding.AwayFromZero);
+            // Debug.Log($"[END2] currentHeight: {currentHeight} remainingHeight: {remainingHeight} addedBoundaryWall: {addedBoundaryWall}");
             return (floorIndex, addedBoundaryWall, currentHeight, remainingHeight);
         }
 
