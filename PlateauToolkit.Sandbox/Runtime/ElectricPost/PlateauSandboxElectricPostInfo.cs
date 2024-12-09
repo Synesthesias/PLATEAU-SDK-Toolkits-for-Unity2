@@ -80,46 +80,56 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             m_BackConnectedPosts.Add((other, isOtherFront));
         }
 
-        public bool CanShowFrontWire()
+        public bool CanShowFrontWire(out int connectedCount)
         {
+            connectedCount = -1;
             if (m_FrontConnectedPosts.Count == 0)
             {
                 return false;
             }
 
             // 相手が表示されてなければ表示
+            int count = 0;
             foreach (var frontConnectedPost in m_FrontConnectedPosts)
             {
                 if (frontConnectedPost.isFront && !frontConnectedPost.target.IsShowingFrontWire)
                 {
+                    connectedCount = count;
                     return true;
                 }
                 else if (!frontConnectedPost.isFront && !frontConnectedPost.target.IsShowingBackWire)
                 {
+                    connectedCount = count;
                     return true;
                 }
+                count++;
             }
             return false;
         }
 
-        public bool CanShowBackWire()
+        public bool CanShowBackWire(out int connectedCount)
         {
+            connectedCount = -1;
             if (m_BackConnectedPosts.Count == 0)
             {
                 return false;
             }
 
             // 相手が表示されてなければ表示
+            int count = 0;
             foreach (var backConnectedPost in m_BackConnectedPosts)
             {
                 if (backConnectedPost.isFront && !backConnectedPost.target.IsShowingFrontWire)
                 {
+                    connectedCount = count;
                     return true;
                 }
                 else if (!backConnectedPost.isFront && !backConnectedPost.target.IsShowingBackWire)
                 {
+                    connectedCount = count;
                     return true;
                 }
+                count++;
             }
             return false;
         }
