@@ -9,8 +9,6 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
     {
         // ワイヤー
         private PlateauSandboxElectricPostWireHandler m_ElectricPostWireHandler;
-        public (bool isShowing, PlateauSandboxElectricPost post) ShowingFrontWire => m_ElectricPostWireHandler.FrontShowing;
-        public (bool isShowing, PlateauSandboxElectricPost post) ShowingBackWire => m_ElectricPostWireHandler.BackShowing;
 
         // 接続部分
         private PlateauSandboxElectricPostConnectPoints m_ElectricPostConnectPoints;
@@ -23,9 +21,10 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         // メッシュ操作
         private PlateauSandboxElectricPostMesh m_Mesh;
 
+        // info
         private PlateauSandboxElectricPostInfo m_Info;
-        public List<(PlateauSandboxElectricPost target, bool isFront)> FrontConnectedPosts => m_Info?.FrontConnectedPosts;
-        public List<(PlateauSandboxElectricPost target, bool isFront)> BackConnectedPosts => m_Info?.BackConnectedPosts;
+        public List<PlateauSandboxElectricConnectInfo> FrontConnectedPosts => m_Info.FrontConnectedPosts;
+        public List<PlateauSandboxElectricConnectInfo> BackConnectedPosts => m_Info.BackConnectedPosts;
 
         private void Start()
         {
@@ -51,8 +50,22 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            m_Info.FrontConnectedPosts.ForEach(x => x.target?.RemoveConnectedPost(this));
-            m_Info.BackConnectedPosts.ForEach(x => x.target?.RemoveConnectedPost(this));
+            for (int i = 0; i < m_Info.FrontConnectedPosts.Count; i++)
+            {
+                var target = m_Info.FrontConnectedPosts[i].m_Target;
+                if (target != null)
+                {
+                    target.RemoveConnection(m_Info.FrontConnectedPosts[i].m_IsFront, i);
+                }
+            }
+            for (int i = 0; i < m_Info.BackConnectedPosts.Count; i++)
+            {
+                var target = m_Info.BackConnectedPosts[i].m_Target;
+                if (target != null)
+                {
+                    target.RemoveConnection(m_Info.BackConnectedPosts[i].m_IsFront, i);
+                }
+            }
         }
 
         private void SearchPost()
@@ -65,10 +78,29 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 bool isOwnFront = IsTargetFacingForward(nearestPost.transform.position);
                 bool isOtherFront = nearestPost.IsTargetFacingForward(transform.position);
 
+                // Wire生成
+                int ownIndex = AddConnectionAndWires(isOwnFront);
+                int otherIndex = nearestPost.AddConnectionAndWires(isOtherFront);
+
+                // 接続
                 string wireID = m_Info.GetNextWireID();
-                AddConnectPoint(nearestPost, isOwnFront, isOtherFront);
-                nearestPost.AddConnectPoint(this, isOtherFront, isOwnFront);
+                SetConnectPoint(nearestPost, isOwnFront, isOtherFront, ownIndex, wireID, otherIndex);
+                nearestPost.SetConnectPoint(this, isOtherFront, isOwnFront, otherIndex, wireID, ownIndex);
             }
+        }
+
+        public int AddConnectionAndWires(bool isFront)
+        {
+            int index = AddConnectionSpace(isFront);
+            if (isFront)
+            {
+                m_ElectricPostWireHandler.CreateWires(true, index);
+            }
+            else
+            {
+                m_ElectricPostWireHandler.CreateWires(false, index);
+            }
+            return index;
         }
 
         private void Update()
@@ -90,19 +122,11 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            if (m_Info.CanShowWire(out int targetCount, true, this))
+            for (int i = 0; i < m_Info.FrontConnectedPosts.Count; i++)
             {
-                var targetPost = FrontConnectedPosts[targetCount];
-                if (targetPost.target != null)
-                {
-                    m_ElectricPostWireHandler.ShowToTarget(
-                        true,
-                        targetPost.target,
-                        targetPost.isFront);
-                    return;
-                }
+                var post = m_Info.FrontConnectedPosts[i];
+                m_ElectricPostWireHandler.TryShowWires(true, i, post.m_Target, post.m_IsFront);
             }
-            m_ElectricPostWireHandler.Hide(true);
         }
 
         private void TryShowBackWire()
@@ -113,19 +137,11 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            if (m_Info.CanShowWire(out int targetCount, false, this))
+            for (int i = 0; i < m_Info.BackConnectedPosts.Count; i++)
             {
-                var targetPost = BackConnectedPosts[targetCount];
-                if (targetPost.target != null)
-                {
-                    m_ElectricPostWireHandler.ShowToTarget(
-                        false,
-                        targetPost.target,
-                        targetPost.isFront);
-                    return;
-                }
+                var post = m_Info.BackConnectedPosts[i];
+                m_ElectricPostWireHandler.TryShowWires(false, i, post.m_Target, post.m_IsFront);
             }
-            m_ElectricPostWireHandler.Hide(false);
         }
 
         private PlateauSandboxElectricPost GetNearestPost()
@@ -192,73 +208,57 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             return false;
         }
 
-        public void AddConnectionSpace(bool isFront)
+        public int AddConnectionSpace(bool isFront)
         {
-            m_Info.AddConnectionSpace(isFront);
+            return m_Info.AddConnectionSpace(isFront);
         }
 
-        public void RemoveConnection(bool isFront, int count)
+        public string RemoveConnection(bool isFront, int count)
         {
             m_Info.RemoveConnection(isFront, count);
+            return m_ElectricPostWireHandler.RemoveWires(isFront, count);
         }
 
-        public void AddConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront, string wireID)
+        public void SetConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront, int index, string wireID, int otherIndex)
         {
+            m_ElectricPostWireHandler.SetWireID(isFront, index, wireID);
             if (isFront)
             {
-                m_Info.AddFrontConnect(other, isOtherFront, wireID);
+                m_Info.SetFrontConnect(other, isOtherFront, index, otherIndex);
             }
             else
             {
-                m_Info.AddBackConnect(other, isOtherFront, wireID);
+                m_Info.SetBackConnect(other, isOtherFront, index, otherIndex);
             }
         }
 
-        public void SetConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront, int index)
+        public void TryShowWire(bool isFront, int index, PlateauSandboxElectricPost target, bool isTargetFront)
         {
-            if (isFront)
-            {
-                m_Info.SetFrontConnect(other, isOtherFront, index);
-            }
-            else
-            {
-                m_Info.SetBackConnect(other, isOtherFront, index);
-            }
+            m_ElectricPostWireHandler.TryShowWires(isFront, index, target, isTargetFront);
         }
 
-        public void RemoveConnectedPost(PlateauSandboxElectricPost targetPost)
+        public void SetWire(bool isFront, int index)
         {
-            var postIndex = m_Info.GetConnectedPostIndex(targetPost);
-            if (postIndex.index < 0)
-            {
-                return;
-            }
-
-            if (postIndex.isFront)
-            {
-                m_Info.RemoveConnection(true, postIndex.index);
-                m_ElectricPostWireHandler.Hide(true);
-            }
-            else
-            {
-                m_Info.RemoveConnection(false, postIndex.index);
-                m_ElectricPostWireHandler.Hide(false);
-            }
+            string wireID = m_Info.GetNextWireID();
+            m_ElectricPostWireHandler.SetWireID(isFront, index, wireID);
         }
 
-        public void OnHoverConnectionPoint(bool isOwnFront, PlateauSandboxElectricPost other, bool isOtherFront)
-        {
-            // ホバー時にセットせず線のみ表示
-            m_ElectricPostWireHandler.ShowToTarget(
-                isOwnFront,
-                other,
-                isOtherFront);
-        }
-
-        public void OnLeaveConnectionPoint(bool isOwnFront)
+        public void RemoveWireID(bool isFront, int index)
         {
             // ホバー終了したら非表示
-            m_ElectricPostWireHandler.Hide(isOwnFront);
+            m_ElectricPostWireHandler.RemoveWireID(isFront, index);
+        }
+
+        public string ResetConnection(bool isFront, int index)
+        {
+            string wireID = m_ElectricPostWireHandler.RemoveWireID(isFront, index);
+            m_Info.ResetConnection(isFront, index);
+            return wireID;
+        }
+
+        public string GetWireID()
+        {
+            return m_Info.GetNextWireID();
         }
 
         public Vector3 GetConnectPoint(PlateauSandboxElectricPostWireType wireType, bool isFront)
@@ -289,55 +289,9 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             return m_ElectricPostConnectPoints.GetConnectPoint(PlateauSandboxElectricPostWireType.k_TopB, true);
         }
 
-        public bool IsConnectedFront(PlateauSandboxElectricPost target)
+        public PlateauSandboxElectricConnectInfo GetConnectedPost(bool isFront, int index)
         {
-            var indexInfo = m_Info.GetConnectedPostIndex(target);
-            if (indexInfo.index < 0)
-            {
-                return false;
-            }
-            return indexInfo.isFront;
-        }
-
-        public void TryReleaseWire(bool isFront, int index)
-        {
-            if (isFront)
-            {
-                if (m_Info.FrontConnectedPosts[index].target != null)
-                {
-                    m_Info.FrontConnectedPosts[index].target.TryReleaseWire(this);
-                    m_Info.ResetConnection(true, index);
-                    m_ElectricPostWireHandler.Hide(true);
-                }
-            }
-            else
-            {
-                if (m_Info.BackConnectedPosts[index].target != null)
-                {
-                    m_Info.BackConnectedPosts[index].target.TryReleaseWire(this);
-                    m_Info.ResetConnection(false, index);
-                    m_ElectricPostWireHandler.Hide(false);
-                }
-            }
-        }
-
-        public void TryReleaseWire(PlateauSandboxElectricPost target)
-        {
-            var indexInfo = m_Info.GetConnectedPostIndex(target);
-            if (indexInfo.index < 0)
-            {
-                return;
-            }
-            if (indexInfo.isFront)
-            {
-                m_Info.ResetConnection(true, indexInfo.index);
-                m_ElectricPostWireHandler.Hide(true);
-            }
-            else
-            {
-                m_Info.ResetConnection(false, indexInfo.index);
-                m_ElectricPostWireHandler.Hide(false);
-            }
+            return m_Info.GetConnectedPost(isFront, index);
         }
     }
 }

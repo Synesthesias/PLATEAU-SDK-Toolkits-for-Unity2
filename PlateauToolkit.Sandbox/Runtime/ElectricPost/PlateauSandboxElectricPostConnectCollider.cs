@@ -34,7 +34,8 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             m_ParentPost.SetHighLight(true);
 
             // 選択中の電柱から電線を表示してもらう
-            info.post.OnHoverConnectionPoint(info.isFront, m_ParentPost, isFront);
+            info.post.SetWire(info.isFront, info.index);
+            info.post.TryShowWire(info.isFront, info.index, m_ParentPost, isFront);
         }
 
         public void OnMoveLeave(PlateauSandboxElectricPostSelectingInfo info)
@@ -44,7 +45,10 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            info.post.OnLeaveConnectionPoint(info.isFront);
+            // 電線非表示
+            info.post.RemoveWireID(info.isFront, info.index);
+            info.post.TryShowWire(info.isFront, info.index, m_ParentPost, isFront);
+
             m_ParentPost.SetHighLight(false);
         }
 
@@ -55,9 +59,13 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
+            // 自身の接続情報を設定
+            int ownIndex = m_ParentPost.AddConnectionAndWires(isFront);
+
             // 接続
-            m_ParentPost.AddConnectPoint(info.post, isFront, info.isFront);
-            info.post.SetConnectPoint(m_ParentPost, info.isFront, isFront, info.index);
+            string wireID = m_ParentPost.GetWireID();
+            m_ParentPost.SetConnectPoint(info.post, isFront, info.isFront, ownIndex, wireID, info.index);
+            info.post.SetConnectPoint(m_ParentPost, info.isFront, isFront, info.index, wireID, ownIndex);
 
             // ハイライト解除
             m_ParentPost.SetHighLight(false);

@@ -23,9 +23,16 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         private PlateauSandboxElectricPost m_TargetPost;
         private bool m_TargetIsFront;
 
-        public PlateauSandboxElectricPostWire(GameObject wire)
+        private int m_Index;
+        public int Index => m_Index;
+
+        private string m_WireID;
+        public string WireID => m_WireID;
+
+        public PlateauSandboxElectricPostWire(GameObject wire, int index = -1)
         {
             m_ElectricWire = wire;
+            m_Index = index;
             m_WireType = PlateauSandboxElectricPostWireTypeExtensions.GetWireType(wire);
             m_IsFrontWire = PlateauSandboxElectricPostWireTypeExtensions.IsFrontWire(wire);
 
@@ -39,6 +46,14 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             if (wire.TryGetComponent<MeshRenderer>(out var meshRenderer))
             {
                 m_WireScaleSize = meshRenderer.bounds.size.magnitude;
+            }
+        }
+
+        public void TryShow(int index)
+        {
+            if (m_Index == index)
+            {
+                Show(true);
             }
         }
 
@@ -88,10 +103,34 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 new Vector3(m_ElectricWire.transform.localScale.x, distance / m_WireScaleSize, m_ElectricWire.transform.localScale.z);
         }
 
-        public void Hide()
+        public void TryHide(int index)
         {
-            m_ElectricWire.transform.localScale = new Vector3(1, 1, 1);
-            Show(false);
+            if (m_Index == index)
+            {
+                m_ElectricWire.transform.localScale = new Vector3(1, 1, 1);
+                Show(false);
+            }
+        }
+
+        public void SetWireID(string wireID)
+        {
+            m_WireID = wireID;
+        }
+
+        public string RemoveWireID()
+        {
+            string wireID = m_WireID;
+            m_WireID = string.Empty;
+            return wireID;
+        }
+
+        public void Remove()
+        {
+#if UNITY_EDITOR
+            GameObject.DestroyImmediate(m_ElectricWire);
+#else
+            GameObject.Destroy(m_ElectricWire);
+#endif
         }
     }
 }

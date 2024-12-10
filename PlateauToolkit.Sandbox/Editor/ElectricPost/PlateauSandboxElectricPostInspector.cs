@@ -17,14 +17,12 @@ namespace PlateauToolkit.Sandbox.Editor
 
         private PlateauSandboxElectricPostConnectionGUI m_FrontConnectionGUI;
         private PlateauSandboxElectricPostConnectionGUI m_BackConnectionGUI;
-        private PlateauSandboxElectricPostKeyEvent m_KeyEvent;
 
         private void OnEnable()
         {
             m_Target = target as PlateauSandboxElectricPost;
             m_Context = PlateauSandboxElectricPostContext.GetCurrent();
             m_Context.OnSelected.AddListener(ResetSelect);
-            m_KeyEvent = new PlateauSandboxElectricPostKeyEvent();
 
             SetGUI();
         }
@@ -33,14 +31,14 @@ namespace PlateauToolkit.Sandbox.Editor
         {
             if (m_FrontConnectionGUI == null)
             {
-                m_FrontConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, true, m_KeyEvent);
+                m_FrontConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, true);
                 m_FrontConnectionGUI.OnClickSelect.AddListener(SelectingPost);
                 // m_FrontConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(true));
                 // m_FrontConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetFrontConnectPointToFacing(post));
             }
             if (m_BackConnectionGUI == null)
             {
-                m_BackConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, false, m_KeyEvent);
+                m_BackConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, false);
                 m_BackConnectionGUI.OnClickSelect.AddListener(SelectingPost);
                 // m_BackConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(false));
                 // m_BackConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetBackConnectPointToFacing(post));
@@ -61,15 +59,8 @@ namespace PlateauToolkit.Sandbox.Editor
             m_BackConnectionGUI.DrawLayout(m_Target.BackConnectedPosts);
 
             // キーイベント
-            if (m_KeyEvent.IsEscapeKey())
+            if (Event.current.keyCode == KeyCode.Escape)
             {
-                ResetSelect();
-            }
-
-            if (m_KeyEvent.IsFocusDelete(out PlateauSandboxElectricPost post))
-            {
-                m_Target.RemoveConnectedPost(post);
-                post.RemoveConnectedPost(m_Target);
                 ResetSelect();
             }
         }
