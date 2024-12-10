@@ -14,10 +14,14 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         public bool IsFrontWire => m_IsFrontWire;
 
         private GameObject m_ElectricWire;
+        public GameObject ElectricWire => m_ElectricWire;
         public Vector3 WirePosition => m_ElectricWire.transform.position;
 
         private Quaternion m_DefaultLocalRotate;
         private float m_WireScaleSize;
+
+        private PlateauSandboxElectricPost m_TargetPost;
+        private bool m_TargetIsFront;
 
         public PlateauSandboxElectricPostWire(GameObject wire)
         {
@@ -41,6 +45,17 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         public void Show(bool isShow)
         {
             m_ElectricWire.SetActive(isShow);
+        }
+
+        public void SetTarget(PlateauSandboxElectricPost post, bool isFront)
+        {
+            m_TargetPost = post;
+            m_TargetIsFront = isFront;
+        }
+
+        public bool IsTarget(PlateauSandboxElectricPost post, bool isFront)
+        {
+            return m_TargetPost == post && m_TargetIsFront == isFront;
         }
 
         public void SetElectricNode(Vector3 position)

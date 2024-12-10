@@ -164,8 +164,9 @@ namespace PlateauToolkit.Sandbox.Editor
                 .Button("削除する"))
             {
                 m_KeyEvent.RemoveFocusPost(post, count);
-                m_Own.RemoveConnectedPost(post);
-                post.RemoveConnectedPost(m_Own);
+                m_Own.RemoveConnection(m_IsFront, count);
+
+                post?.RemoveConnectedPost(m_Own);
             }
         }
 
@@ -185,6 +186,7 @@ namespace PlateauToolkit.Sandbox.Editor
 
         public void Reset()
         {
+            m_Context.ResetSelect();
             m_SelectingIndex = -1;
         }
     }

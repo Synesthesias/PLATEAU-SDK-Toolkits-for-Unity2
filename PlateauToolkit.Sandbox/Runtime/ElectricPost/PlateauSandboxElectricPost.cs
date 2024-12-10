@@ -9,8 +9,8 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
     {
         // ワイヤー
         private PlateauSandboxElectricPostWireHandler m_ElectricPostWireHandler;
-        public bool IsShowingFrontWire => m_ElectricPostWireHandler.IsFrontShowing;
-        public bool IsShowingBackWire => m_ElectricPostWireHandler.IsBackShowing;
+        public (bool isShowing, PlateauSandboxElectricPost post) ShowingFrontWire => m_ElectricPostWireHandler.FrontShowing;
+        public (bool isShowing, PlateauSandboxElectricPost post) ShowingBackWire => m_ElectricPostWireHandler.BackShowing;
 
         // 接続部分
         private PlateauSandboxElectricPostConnectPoints m_ElectricPostConnectPoints;
@@ -65,6 +65,7 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 bool isOwnFront = IsTargetFacingForward(nearestPost.transform.position);
                 bool isOtherFront = nearestPost.IsTargetFacingForward(transform.position);
 
+                string wireID = m_Info.GetNextWireID();
                 AddConnectPoint(nearestPost, isOwnFront, isOtherFront);
                 nearestPost.AddConnectPoint(this, isOtherFront, isOwnFront);
             }
@@ -89,7 +90,7 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            if (m_Info.CanShowFrontWire(out int targetCount))
+            if (m_Info.CanShowWire(out int targetCount, true, this))
             {
                 var targetPost = FrontConnectedPosts[targetCount];
                 if (targetPost.target != null)
@@ -112,7 +113,7 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
                 return;
             }
 
-            if (m_Info.CanShowBackWire(out int targetCount))
+            if (m_Info.CanShowWire(out int targetCount, false, this))
             {
                 var targetPost = BackConnectedPosts[targetCount];
                 if (targetPost.target != null)
@@ -201,15 +202,15 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             m_Info.RemoveConnection(isFront, count);
         }
 
-        public void AddConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront)
+        public void AddConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront, string wireID)
         {
             if (isFront)
             {
-                m_Info.AddFrontConnect(other, isOtherFront);
+                m_Info.AddFrontConnect(other, isOtherFront, wireID);
             }
             else
             {
-                m_Info.AddBackConnect(other, isOtherFront);
+                m_Info.AddBackConnect(other, isOtherFront, wireID);
             }
         }
 

@@ -13,14 +13,14 @@ namespace PlateauToolkit.Sandbox.Runtime
 
         private const string k_ElectricWireRootName = "Wires";
 
-        private readonly List<PlateauSandboxElectricPostWire> m_PostWires = new();
-            public List<PlateauSandboxElectricPostWire> PostWires => m_PostWires;
+        private readonly List<PlateauSandboxElectricPostWire> m_FrontPostWires = new();
+        private readonly List<PlateauSandboxElectricPostWire> m_BackPostWires = new();
 
-        private bool m_IsFrontShowing = false;
-        public bool IsFrontShowing => m_IsFrontShowing;
+        private (bool isShowing, PlateauSandboxElectricPost post) m_FrontShowing = new();
+        public (bool isShowing, PlateauSandboxElectricPost post) FrontShowing => m_FrontShowing;
 
-        private bool m_IsBackShowing = false;
-        public bool IsBackShowing => m_IsBackShowing;
+        private (bool isShowing, PlateauSandboxElectricPost post) m_BackShowing = new();
+        public (bool isShowing, PlateauSandboxElectricPost post) BackShowing => m_BackShowing;
 
         public PlateauSandboxElectricPostWireHandler(GameObject post)
         {
@@ -39,7 +39,14 @@ namespace PlateauToolkit.Sandbox.Runtime
                 }
 
                 wire.Show(false);
-                m_PostWires.Add(wire);
+                if (wire.IsFrontWire)
+                {
+                    m_FrontPostWires.Add(wire);
+                }
+                else
+                {
+                    m_BackPostWires.Add(wire);
+                }
             }
         }
 
@@ -50,24 +57,23 @@ namespace PlateauToolkit.Sandbox.Runtime
                 return;
             }
 
-            foreach (var postWire in m_PostWires)
+            foreach (var postWire in isOwnFront ? m_FrontPostWires : m_BackPostWires)
             {
-                if (postWire.IsFrontWire != isOwnFront)
-                {
-                    continue;
-                }
+                // 複製して使用する
+                var wire = GameObject.Instantiate(postWire.ElectricWire, m_WireRoot.transform);
+                var createWire = new PlateauSandboxElectricPostWire(wire);
 
-                var targetConnectPosition = targetPost.GetConnectPoint(postWire.WireType, isTargetFront);
-                postWire.SetElectricNode(targetConnectPosition);
+                var targetConnectPosition = targetPost.GetConnectPoint(createWire.WireType, isTargetFront);
+                createWire.SetElectricNode(targetConnectPosition);
             }
 
             if (isOwnFront)
             {
-                m_IsFrontShowing = true;
+                m_FrontShowing = (true, targetPost);
             }
             else
             {
-                m_IsBackShowing = true;
+                m_BackShowing = (true, targetPost);
             }
         }
 
@@ -82,11 +88,11 @@ namespace PlateauToolkit.Sandbox.Runtime
             }
             if (isFront)
             {
-                m_IsFrontShowing = false;
+                m_FrontShowing = (false, null);
             }
             else
             {
-                m_IsBackShowing = false;
+                m_BackShowing = (false, null);
             }
         }
     }
