@@ -94,11 +94,19 @@ namespace PlateauToolkit.Sandbox.Editor
 
         public PlateauSandboxElectricPost DrawConnectedPost(int count, PlateauSandboxElectricPost target)
         {
+            string focusName = "";
+            if (target != null)
+            {
+                // フォーカス時の名前を設定
+                focusName = $"{target.name}_{count}";
+                GUI.SetNextControlName(focusName);
+            }
+
             // 接続先の電柱
             var selectedPost = EditorGUILayout.ObjectField(
-                            "",
-                             target,
-                             typeof(PlateauSandboxElectricPost), true) as PlateauSandboxElectricPost;
+                                   "",
+                                   target,
+                                   typeof(PlateauSandboxElectricPost), true) as PlateauSandboxElectricPost;
 
             if (selectedPost != null &&
                 selectedPost != target &&
@@ -111,6 +119,20 @@ namespace PlateauToolkit.Sandbox.Editor
                 string wireID = m_Own.GetWireID();
                 m_Own.SetConnectPoint(selectedPost, m_IsFront, isOtherFront, count, wireID, otherIndex);
                 selectedPost.SetConnectPoint(m_Own, isOtherFront, m_IsFront, otherIndex, wireID, count);
+            }
+
+            // Deleteイベント
+            if (Event.current.keyCode == KeyCode.Delete ||
+                Event.current.keyCode == KeyCode.Backspace)
+            {
+                Debug.Log($"Delete: {GUI.GetNameOfFocusedControl()}");
+                if (GUI.GetNameOfFocusedControl() == focusName)
+                {
+                    // 選択をnullに設定
+                    var post = m_Own.GetConnectedPost(m_IsFront, count);
+                    selectedPost?.ResetConnection(post.m_IsFront, post.m_Index);
+                    m_Own.ResetConnection(m_IsFront, count);
+                }
             }
 
             return selectedPost;
