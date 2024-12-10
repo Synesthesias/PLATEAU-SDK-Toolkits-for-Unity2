@@ -23,8 +23,8 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
 
         // info
         private PlateauSandboxElectricPostInfo m_Info;
-        public List<PlateauSandboxElectricConnectInfo> FrontConnectedPosts => m_Info.FrontConnectedPosts;
-        public List<PlateauSandboxElectricConnectInfo> BackConnectedPosts => m_Info.BackConnectedPosts;
+        public List<PlateauSandboxElectricConnectInfo> FrontConnectedPosts => m_Info?.FrontConnectedPosts;
+        public List<PlateauSandboxElectricConnectInfo> BackConnectedPosts => m_Info?.BackConnectedPosts;
 
         private void Start()
         {
