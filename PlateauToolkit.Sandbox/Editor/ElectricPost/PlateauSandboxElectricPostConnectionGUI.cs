@@ -100,9 +100,17 @@ namespace PlateauToolkit.Sandbox.Editor
                              target,
                              typeof(PlateauSandboxElectricPost), true) as PlateauSandboxElectricPost;
 
-            if (selectedPost != null && selectedPost != m_Own)
+            if (selectedPost != null &&
+                selectedPost != target &&
+                selectedPost != m_Own)
             {
-                OnDirectSelect.Invoke(selectedPost);
+                // ドロップで直接セット
+                bool isOtherFront = selectedPost.IsTargetFacingForward(selectedPost.gameObject.transform.position);
+                int otherIndex = selectedPost.AddConnectionAndWires(isOtherFront);
+
+                string wireID = m_Own.GetWireID();
+                m_Own.SetConnectPoint(selectedPost, m_IsFront, isOtherFront, count, wireID, otherIndex);
+                selectedPost.SetConnectPoint(m_Own, isOtherFront, m_IsFront, otherIndex, wireID, count);
             }
 
             return selectedPost;
