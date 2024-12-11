@@ -33,15 +33,11 @@ namespace PlateauToolkit.Sandbox.Editor
             {
                 m_FrontConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, true);
                 m_FrontConnectionGUI.OnClickSelect.AddListener(SelectingPost);
-                // m_FrontConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(true));
-                // m_FrontConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetFrontConnectPointToFacing(post));
             }
             if (m_BackConnectionGUI == null)
             {
                 m_BackConnectionGUI = new PlateauSandboxElectricPostConnectionGUI(m_Target, false);
                 m_BackConnectionGUI.OnClickSelect.AddListener(SelectingPost);
-                // m_BackConnectionGUI.OnClickRelease.AddListener(() => TryReleaseWire(false));
-                // m_BackConnectionGUI.OnDirectSelect.AddListener((post) => m_Target.SetBackConnectPointToFacing(post));
             }
         }
 

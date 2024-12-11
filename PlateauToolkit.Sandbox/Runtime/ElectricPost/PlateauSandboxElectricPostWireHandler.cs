@@ -129,21 +129,29 @@ namespace PlateauToolkit.Sandbox.Runtime
             return (index, isFront);
         }
 
-        public void TryShowWires(bool isFront, int index, PlateauSandboxElectricPost targetPost, bool isTargetFront)
+        public void TryShowWires(bool isFront, PlateauSandboxElectricConnectInfo target, bool isNoTarget = false)
         {
             foreach (var postWire in isFront ? m_FrontPostWires : m_BackPostWires)
             {
-                if (postWire.WireID == string.Empty || targetPost == null)
+                if (postWire.WireID == string.Empty || target.m_Target == null)
                 {
                     postWire.Show(false);
                     continue;
                 }
-                if (postWire.Index != index)
+
+                if (target.m_Target.IsShowingWire(postWire.WireID))
+                {
+                    // 既に相手側で表示されているワイヤーは表示しない
+                    postWire.Show(false);
+                    continue;
+                }
+
+                if (!isNoTarget && !postWire.IsTarget(target))
                 {
                     continue;
                 }
 
-                var targetConnectPosition = targetPost.GetConnectPoint(postWire.WireType, isTargetFront);
+                var targetConnectPosition = target.m_Target.GetConnectPoint(postWire.WireType, target.m_IsTargetFront);
                 postWire.SetElectricNode(targetConnectPosition);
             }
         }
@@ -163,6 +171,17 @@ namespace PlateauToolkit.Sandbox.Runtime
                 if (postWire.Index == index)
                 {
                     postWire.SetWireID(wireID);
+                }
+            }
+        }
+
+        public void SetTarget(bool isFront, int index, PlateauSandboxElectricConnectInfo info)
+        {
+            foreach (var postWire in isFront ? m_FrontPostWires : m_BackPostWires)
+            {
+                if (postWire.Index == index)
+                {
+                    postWire.SetTarget(info);
                 }
             }
         }
@@ -203,6 +222,25 @@ namespace PlateauToolkit.Sandbox.Runtime
                 }
             }
             return (isFront, index);
+        }
+
+        public bool IsShowingWire(string wireID)
+        {
+            foreach (var postWire in m_FrontPostWires)
+            {
+                if (postWire.WireID == wireID)
+                {
+                    return postWire.IsShow;
+                }
+            }
+            foreach (var postWire in m_BackPostWires)
+            {
+                if (postWire.WireID == wireID)
+                {
+                    return postWire.IsShow;
+                }
+            }
+            return false;
         }
     }
 }

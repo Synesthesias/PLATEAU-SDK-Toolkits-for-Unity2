@@ -20,14 +20,16 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         private Quaternion m_DefaultLocalRotate;
         private float m_WireScaleSize;
 
-        private PlateauSandboxElectricPost m_TargetPost;
-        private bool m_TargetIsFront;
+        private PlateauSandboxElectricConnectInfo m_TargetInfo;
 
         private int m_Index;
         public int Index => m_Index;
 
         private string m_WireID;
         public string WireID => m_WireID;
+
+        public bool IsShow => m_IsShow;
+        private bool m_IsShow;
 
         public PlateauSandboxElectricPostWire(GameObject wire, int index = -1)
         {
@@ -60,17 +62,21 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         public void Show(bool isShow)
         {
             m_ElectricWire.SetActive(isShow);
+            m_IsShow = isShow;
         }
 
-        public void SetTarget(PlateauSandboxElectricPost post, bool isFront)
+        public void SetTarget(PlateauSandboxElectricConnectInfo info)
         {
-            m_TargetPost = post;
-            m_TargetIsFront = isFront;
+            m_TargetInfo = info;
         }
 
-        public bool IsTarget(PlateauSandboxElectricPost post, bool isFront)
+        public bool IsTarget(PlateauSandboxElectricConnectInfo info)
         {
-            return m_TargetPost == post && m_TargetIsFront == isFront;
+            if (m_TargetInfo == null)
+            {
+                return false;
+            }
+            return m_TargetInfo.m_Target == info.m_Target && m_TargetInfo.m_IsTargetFront == info.m_IsTargetFront;
         }
 
         public void SetElectricNode(Vector3 position)
@@ -115,6 +121,7 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         public void SetWireID(string wireID)
         {
             m_WireID = wireID;
+            m_ElectricWire.name = $"{m_ElectricWire.name}_{m_IsFrontWire}_{m_Index}_{wireID}";
         }
 
         public string RemoveWireID()

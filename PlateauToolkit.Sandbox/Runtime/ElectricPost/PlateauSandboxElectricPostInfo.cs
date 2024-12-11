@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
 {
-    public struct PlateauSandboxElectricConnectInfo
+    public class PlateauSandboxElectricConnectInfo
     {
         public PlateauSandboxElectricPost m_Target;
-        public bool m_IsFront;
-        public int m_Index;
+        public bool m_IsTargetFront;
+        public int m_OwnIndex;
+        public int m_TargetIndex;
     }
 
     /// <summary>
@@ -25,13 +27,23 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         {
             if (isFront)
             {
-                m_FrontConnectedPosts.Add(new PlateauSandboxElectricConnectInfo());
-                return m_FrontConnectedPosts.Count - 1;
+                int index = m_FrontConnectedPosts.Count;
+                var info = new PlateauSandboxElectricConnectInfo()
+                {
+                    m_OwnIndex = index
+                };
+                m_FrontConnectedPosts.Add(info);
+                return index;
             }
             else
             {
-                m_BackConnectedPosts.Add(new PlateauSandboxElectricConnectInfo());
-                return m_BackConnectedPosts.Count - 1;
+                int index = m_BackConnectedPosts.Count;
+                var info = new PlateauSandboxElectricConnectInfo()
+                {
+                    m_OwnIndex = index
+                };
+                m_BackConnectedPosts.Add(info);
+                return index;
             }
         }
 
@@ -39,16 +51,28 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         {
             if (isFront)
             {
-                if (index >= 0 && index < m_FrontConnectedPosts.Count)
+                foreach (var plateauSandboxElectricConnectInfo in m_FrontConnectedPosts)
                 {
-                    m_FrontConnectedPosts[index] = new PlateauSandboxElectricConnectInfo();
+                    if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
+                    {
+                        plateauSandboxElectricConnectInfo.m_IsTargetFront = false;
+                        plateauSandboxElectricConnectInfo.m_Target = null;
+                        plateauSandboxElectricConnectInfo.m_TargetIndex = -1;
+                        return;
+                    }
                 }
             }
             else
             {
-                if (index >= 0 && index < m_BackConnectedPosts.Count)
+                foreach (var plateauSandboxElectricConnectInfo in m_BackConnectedPosts)
                 {
-                    m_BackConnectedPosts[index] = new PlateauSandboxElectricConnectInfo();
+                    if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
+                    {
+                        plateauSandboxElectricConnectInfo.m_IsTargetFront = false;
+                        plateauSandboxElectricConnectInfo.m_Target = null;
+                        plateauSandboxElectricConnectInfo.m_TargetIndex = -1;
+                        return;
+                    }
                 }
             }
         }
@@ -57,39 +81,39 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         {
             if (isFront)
             {
-                if (index >= 0 && index < m_FrontConnectedPosts.Count)
-                {
-                    m_FrontConnectedPosts.RemoveAt(index);
-                }
+                m_FrontConnectedPosts.RemoveAll(x => x.m_OwnIndex == index);
             }
             else
             {
-                if (index >= 0 && index < m_BackConnectedPosts.Count)
-                {
-                    m_BackConnectedPosts.RemoveAt(index);
-                }
+                m_BackConnectedPosts.RemoveAll(x => x.m_OwnIndex == index);
             }
         }
 
         public void SetFrontConnect(PlateauSandboxElectricPost other, bool isOtherFront, int index, int otherIndex)
         {
-            if (m_FrontConnectedPosts.Count > index)
+            foreach (var plateauSandboxElectricConnectInfo in m_FrontConnectedPosts)
             {
-                m_FrontConnectedPosts[index] = new PlateauSandboxElectricConnectInfo()
+                if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
                 {
-                    m_Target = other, m_IsFront = isOtherFront, m_Index = otherIndex
-                };
+                    plateauSandboxElectricConnectInfo.m_IsTargetFront = isOtherFront;
+                    plateauSandboxElectricConnectInfo.m_Target = other;
+                    plateauSandboxElectricConnectInfo.m_TargetIndex = otherIndex;
+                    return;
+                }
             }
         }
 
         public void SetBackConnect(PlateauSandboxElectricPost other, bool isOtherFront, int index, int otherIndex)
         {
-            if (m_BackConnectedPosts.Count > index)
+            foreach (var plateauSandboxElectricConnectInfo in m_BackConnectedPosts)
             {
-                m_BackConnectedPosts[index] = new PlateauSandboxElectricConnectInfo()
+                if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
                 {
-                    m_Target = other, m_IsFront = isOtherFront, m_Index = otherIndex
-                };
+                    plateauSandboxElectricConnectInfo.m_IsTargetFront = isOtherFront;
+                    plateauSandboxElectricConnectInfo.m_Target = other;
+                    plateauSandboxElectricConnectInfo.m_TargetIndex = otherIndex;
+                    return;
+                }
             }
         }
 
@@ -97,16 +121,22 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         {
             if (isFront)
             {
-                if (index >= 0 && index < m_FrontConnectedPosts.Count)
+                foreach (var plateauSandboxElectricConnectInfo in m_FrontConnectedPosts)
                 {
-                    return m_FrontConnectedPosts[index];
+                    if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
+                    {
+                        return plateauSandboxElectricConnectInfo;
+                    }
                 }
             }
             else
             {
-                if (index >= 0 && index < m_BackConnectedPosts.Count)
+                foreach (var plateauSandboxElectricConnectInfo in m_BackConnectedPosts)
                 {
-                    return m_BackConnectedPosts[index];
+                    if (plateauSandboxElectricConnectInfo.m_OwnIndex == index)
+                    {
+                        return plateauSandboxElectricConnectInfo;
+                    }
                 }
             }
             return new PlateauSandboxElectricConnectInfo();
