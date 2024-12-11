@@ -1172,7 +1172,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_DepressionWallColorData = new DepressionWallColorData
                             {
-                                m_WallColor = config.commercialFacilityVertexColorPalette.depressionWallColor,
+                                m_DepressionWallColor = config.commercialFacilityVertexColorPalette.depressionWallColor,
                                 m_VertexColorWallMat = config.commercialFacilityVertexColorMaterialPalette.vertexWall,
                                 m_PositionType = positionType
                             };
@@ -1193,7 +1193,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                         {
                             m_DepressionWallColorData = new DepressionWallColorData
                             {
-                                m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingDepressionWallColor,
+                                m_DepressionWallColor = config.complexBuildingVertexColorPalette.commercialBuildingDepressionWallColor,
                                 m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                 m_PositionType = positionType
                             };

@@ -931,7 +931,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
             return horizontal;
         }
 
-        private HorizontalLayout CreateDepressionWallNormalFacadeHorizontal(List<PanelSize> panelSizes, int from, int to, float height, float floorWidthOffset, bool isEntrace, BuildingGenerator.Config config)
+        private HorizontalLayout CreateDepressionWallNormalFacadeHorizontal(List<PanelSize> panelSizes, int from, int to, float height, float floorWidthOffset, bool isEntrance, BuildingGenerator.Config config)
         {
             var horizontal = new HorizontalLayout();
             for (int i = from; i < to; i++)
@@ -955,7 +955,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 }
 
                 float panelWidth = m_SizeValues[panelSizes[i]] + floorWidthOffset;
-                if (isEntrace)
+                if (isEntrance)
                 {
                     var depressionWall = new List<Func<ILayoutElement>>
                     {

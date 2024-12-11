@@ -139,12 +139,12 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                 .PartialBox(width, depressionThickness, height, Directions.YAxis)
                 .FlipFaces()
                 .Move(origin + width / 2 + height / 2 + depressionThickness / 2)
-                .Paint(wallColorData.m_WallColor, wallColorData.m_VertexColorWallMat);
+                .Paint(wallColorData.m_DepressionWallColor, wallColorData.m_VertexColorWallMat);
 
             MeshDraft depressionWallBack = MeshDraft
                 .PartialBox(depressionWidth, -depressionThickness, height, Directions.Back)
                 .Move(origin + depressionMoveWidth + height / 2 + depressionThickness / 2)
-                .Paint(wallColorData.m_WallColor, wallColorData.m_VertexColorWallMat);
+                .Paint(wallColorData.m_DepressionWallColor, wallColorData.m_VertexColorWallMat);
             depressionWallYAxis.Add(depressionWallBack);
             depressionWallYAxis.name = k_WallDraftName;
 
