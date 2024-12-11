@@ -246,6 +246,11 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             m_ElectricPostWireHandler.TryShowWires(isFront, index, target, isTargetFront);
         }
 
+        public void HideWire(bool isFront, int index)
+        {
+            m_ElectricPostWireHandler.HideWires(isFront, index);
+        }
+
         public void SetWire(bool isFront, int index)
         {
             string wireID = m_Info.GetNextWireID();

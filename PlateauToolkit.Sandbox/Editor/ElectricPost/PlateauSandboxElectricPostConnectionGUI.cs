@@ -166,6 +166,10 @@ namespace PlateauToolkit.Sandbox.Editor
                     other?.ResetConnection(post.m_IsFront, post.m_Index);
                     m_Own.ResetConnection(m_IsFront, index);
 
+                    // ワイヤーを非表示に
+                    m_Own.HideWire(m_IsFront, index);
+                    other?.HideWire(post.m_IsFront, post.m_Index);
+
                     m_SelectingIndex = index;
                     m_Context.SetSelectingPost(m_Own, m_IsFront, index);
                 }
