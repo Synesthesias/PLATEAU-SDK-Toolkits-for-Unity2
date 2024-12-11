@@ -373,7 +373,7 @@ MonoBehaviour:
   complexOfficeBuildingParams:
     spandrelHeight: 0.5
   complexBuildingVertexColorPalette:
-    boundaryWallColor: {r: 0.6150943, g: 0.23965532, b: 0, a: 1}
+    boundaryWallColor: {r: 0.18490559, g: 0.116568245, b: 0.073613346, a: 1}
     apartmentWallColor: {r: 0.7283019, g: 0.62130445, b: 0.5153079, a: 1}
     apartmentWindowFrameColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     apartmentWindowGlassColor: {r: 0.59607846, g: 0.9254902, b: 1, a: 1}
