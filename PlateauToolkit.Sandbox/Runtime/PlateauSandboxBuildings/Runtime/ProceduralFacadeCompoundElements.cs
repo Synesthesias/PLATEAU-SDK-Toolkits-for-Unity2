@@ -903,6 +903,48 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             };
                         }
                         break;
+                    case BuildingType.k_ComplexBuilding:
+                        if (UseTexture)
+                        {
+                            m_BalconyTexturedData = new BalconyTexturedData
+                            {
+                                m_ConvexBalcony = config.complexSkyscraperCondominiumBuildingParams.convexBalcony,
+                                m_HasGlassWall = config.complexSkyscraperCondominiumBuildingParams.hasBalconyGlass,
+                                m_UVScale = config.textureScale,
+                                m_BalconyOuterFrameDirections = balconyOuterFrameDirections,
+                                m_WallMat = config.complexBuildingMaterialPalette.apartmentWall,
+                            };
+
+                            m_WindowTexturedData = new ProceduralFacadeWindowElement.WindowTexturedData
+                            {
+                                m_WindowpaneGlassName = k_WindowPaneGlassTexturedDraftName,
+                                m_UVScale = config.textureScale,
+                                m_WallMat = config.complexBuildingMaterialPalette.apartmentWall,
+                                m_WindowPaneMat = config.complexBuildingMaterialPalette.apartmentWindowFrame,
+                                m_WindowGlassMat = config.complexBuildingMaterialPalette.apartmentWindowGlass,
+                            };
+                        }
+                        else
+                        {
+                            m_BalconyColorData = new BalconyColorData
+                            {
+                                m_ConvexBalcony = config.complexSkyscraperCondominiumBuildingParams.convexBalcony,
+                                m_HasGlassWall = config.complexSkyscraperCondominiumBuildingParams.hasBalconyGlass,
+                                m_BalconyOuterFrameDirections = balconyOuterFrameDirections,
+                                m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
+                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall,
+                            };
+
+                            m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                            {
+                                m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
+                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall,
+                                m_WindowPaneColor = config.complexBuildingVertexColorPalette.apartmentWindowFrameColor,
+                                m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.apartmentWindowGlassColor,
+                                m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWindow,
+                            };
+                        }
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
