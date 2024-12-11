@@ -85,17 +85,9 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Co
         [Serializable]
         public class VertexColorMaterialPalette
         {
-            public Material apartmentVertexWall;
-            public Material apartmentVertexWindow;
-            public Material apartmentVertexRoof;
-
-            public Material officeBuildingVertexWall;
-            public Material officeBuildingVertexWindow;
-            public Material officeBuildingVertexRoof;
-
-            public Material commercialBuildingVertexWall;
-            public Material commercialBuildingVertexWindow;
-            public Material commercialBuildingVertexRoof;
+            public Material vertexWall;
+            public Material vertexWindow;
+            public Material vertexRoof;
         }
 
         [Serializable]

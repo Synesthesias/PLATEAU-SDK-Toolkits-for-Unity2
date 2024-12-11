@@ -140,16 +140,19 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings
                         switch (buildingType)
                         {
                             case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
+                                m_RoofColor = m_Config.complexBuildingVertexColorPalette.apartmentRoofColor;
+                                m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.apartmentRoofSideColor;
+                                m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.vertexRoof;
                                 break;
                             case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                 m_RoofColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofColor;
                                 m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.officeBuildingRoofSideColor;
-                                m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexRoof;
+                                m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.vertexRoof;
                                 break;
                             case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                 m_RoofColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofColor;
                                 m_RoofSideColor = m_Config.complexBuildingVertexColorPalette.commercialBuildingRoofSideColor;
-                                m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexRoof;
+                                m_VertexRoofMat = m_Config.complexBuildingVertexColorMaterialPalette.vertexRoof;
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();

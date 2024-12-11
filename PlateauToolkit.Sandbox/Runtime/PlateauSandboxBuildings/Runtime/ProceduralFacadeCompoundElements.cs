@@ -190,21 +190,21 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
-                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                                     };
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
-                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                                     };
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                                     };
                                     break;
                                 default:
@@ -320,37 +320,51 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             switch (buildingType)
                             {
                                 case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
-                                    break;
-                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
                                     {
-                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
-                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall,
-                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
-                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
-                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWindow,
+                                        m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.apartmentWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.apartmentWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                                     };
 
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
-                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow
+                                    };
+                                    break;
+                                case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
+                                    m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
+                                        m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
+                                        m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
+                                    };
+
+                                    m_WallColorData = new WallColorData
+                                    {
+                                        m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                                     };
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                         m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
                                         m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
-                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWindow,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                                     };
 
                                     m_WallColorData = new WallColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall
+                                        m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall
                                     };
                                     break;
                                 default:
@@ -663,30 +677,30 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                     m_WindowColorData = new WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
-                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                         m_WindowPaneColor = config.complexBuildingVertexColorPalette.apartmentWindowFrameColor,
                                         m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.apartmentWindowGlassColor,
-                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWindow,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                                     };
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
                                     m_WindowColorData = new WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.officeBuildingWallColor,
-                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWall,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                         m_WindowPaneColor = config.complexBuildingVertexColorPalette.officeBuildingWindowFrameColor,
                                         m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor,
-                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.officeBuildingVertexWindow,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                                     };
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData = new WindowColorData
                                     {
                                         m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingWallColor,
-                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
+                                        m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                         m_WindowPaneColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowFrameColor,
                                         m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor,
-                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWindow,
+                                        m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                                     };
                                     break;
                                 default:
@@ -775,9 +789,10 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             switch (buildingType)
                             {
                                 case ComplexBuildingConfig.ComplexBuildingType.k_Apartment:
+                                    m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.apartmentWindowGlassColor;
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding:
-                                    m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingWindowGlassColor;
+                                    m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.officeBuildingSpandrelColor;
                                     break;
                                 case ComplexBuildingConfig.ComplexBuildingType.k_CommercialBuilding:
                                     m_WindowColorData.m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.commercialBuildingWindowGlassColor;
@@ -932,16 +947,16 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                                 m_HasGlassWall = config.complexSkyscraperCondominiumBuildingParams.hasBalconyGlass,
                                 m_BalconyOuterFrameDirections = balconyOuterFrameDirections,
                                 m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
-                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall,
+                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                             };
 
                             m_WindowColorData = new ProceduralFacadeWindowElement.WindowColorData
                             {
                                 m_WallColor = config.complexBuildingVertexColorPalette.apartmentWallColor,
-                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWall,
+                                m_VertexWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                 m_WindowPaneColor = config.complexBuildingVertexColorPalette.apartmentWindowFrameColor,
                                 m_WindowPaneGlassColor = config.complexBuildingVertexColorPalette.apartmentWindowGlassColor,
-                                m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.apartmentVertexWindow,
+                                m_VertexWindowPaneMat = config.complexBuildingVertexColorMaterialPalette.vertexWindow,
                             };
                         }
                         break;
@@ -1179,7 +1194,7 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Runtime
                             m_DepressionWallColorData = new DepressionWallColorData
                             {
                                 m_WallColor = config.complexBuildingVertexColorPalette.commercialBuildingDepressionWallColor,
-                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.commercialBuildingVertexWall,
+                                m_VertexColorWallMat = config.complexBuildingVertexColorMaterialPalette.vertexWall,
                                 m_PositionType = positionType
                             };
                         }
