@@ -1,5 +1,6 @@
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Common;
 using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings;
+using PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildingsLib.Buildings.Configs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -548,15 +549,31 @@ namespace PlateauToolkit.Sandbox.Runtime.PlateauSandboxBuildings.Editor
                     {
                         {"buildingBoundaryHeight", new Tuple<string, float, float>("建物同士の境界線の高さ", 10f, 100f)},
                     });
-                    EditorGUILayout.Space(10);
-                    EditorGUILayout.LabelField("マンション設定", EditorStyles.boldLabel);
-                    bool changedComplexSkyscraperCondominiumBuildingParam = DrawDynamicPropertyOnly(m_ComplexSkyscraperCondominiumBuildingParams);
-                    EditorGUILayout.Space(10);
-                    EditorGUILayout.LabelField("オフィスビル設定", EditorStyles.boldLabel);
-                    bool changedComplexOfficeBuildingParam = DrawDynamicPropertyOnly(m_ComplexOfficeBuildingParams, new Dictionary<string, Tuple<string, float, float>>
+
+                    SerializedProperty lowerFloorBuildingTypeProperty = m_ComplexBuildingParams.FindPropertyRelative("lowerFloorBuildingType");
+                    SerializedProperty higherFloorBuildingTypeProperty = m_ComplexBuildingParams.FindPropertyRelative("higherFloorBuildingType");
+                    bool changedComplexSkyscraperCondominiumBuildingParam = false;
+                    bool changedComplexOfficeBuildingParam = false;
+
+                    if (lowerFloorBuildingTypeProperty.enumValueIndex == (int)ComplexBuildingConfig.ComplexBuildingType.k_Apartment ||
+                        higherFloorBuildingTypeProperty.enumValueIndex == (int)ComplexBuildingConfig.ComplexBuildingType.k_Apartment)
                     {
-                        {"spandrelHeight", new Tuple<string, float, float>("壁パネルの高さ", 0.25f, 2.5f)}
-                    });
+                        EditorGUILayout.Space(10);
+                        EditorGUILayout.LabelField("マンション設定", EditorStyles.boldLabel);
+                        changedComplexSkyscraperCondominiumBuildingParam = DrawDynamicPropertyOnly(m_ComplexSkyscraperCondominiumBuildingParams);
+                    }
+
+                    if (lowerFloorBuildingTypeProperty.enumValueIndex == (int)ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding ||
+                        higherFloorBuildingTypeProperty.enumValueIndex == (int)ComplexBuildingConfig.ComplexBuildingType.k_OfficeBuilding)
+                    {
+                        EditorGUILayout.Space(10);
+                        EditorGUILayout.LabelField("オフィスビル設定", EditorStyles.boldLabel);
+                        changedComplexOfficeBuildingParam = DrawDynamicPropertyOnly(m_ComplexOfficeBuildingParams, new Dictionary<string, Tuple<string, float, float>>
+                        {
+                            {"spandrelHeight", new Tuple<string, float, float>("壁パネルの高さ", 0.25f, 2.5f)}
+                        });
+                    }
+
                     return changedComplexBuildingParam || changedComplexSkyscraperCondominiumBuildingParam || changedComplexOfficeBuildingParam;
             }
             return false;
