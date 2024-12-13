@@ -60,7 +60,7 @@ namespace PlateauToolkit.Sandbox.Runtime
 #if UNITY_EDITOR
             GameObject.DestroyImmediate(m_WireRoot.gameObject);
 #else
-            GameObject.Destroy(m_WireRoot.m_WireRoot);
+            GameObject.Destroy(m_WireRoot.gameObject);
 #endif
             m_WireRoot = new GameObject(k_ElectricWireRootName);
             m_WireRoot.transform.SetParent(m_Root.transform);
