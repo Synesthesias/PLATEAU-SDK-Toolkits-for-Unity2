@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
@@ -244,7 +245,9 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         public string RemoveConnection(bool isFront, int index)
         {
             m_Info.RemoveConnection(isFront, index);
-            return m_ElectricPostWireHandler.RemoveWires(isFront, index);
+            string wireName = m_ElectricPostWireHandler.RemoveWires(isFront, index);
+            Save();
+            return wireName;
         }
 
         public void SetConnectPoint(PlateauSandboxElectricPost other, bool isFront, bool isOtherFront, int index, string wireID, int otherIndex)
@@ -264,6 +267,14 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
             {
                 m_Info.SetBackConnect(other, isOtherFront, index, otherIndex, wireID);
             }
+            Save();
+        }
+
+        private void Save()
+        {
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
         }
 
         public void TryShowWire(bool isFront, int index, PlateauSandboxElectricPost target, bool isTargetFront)
