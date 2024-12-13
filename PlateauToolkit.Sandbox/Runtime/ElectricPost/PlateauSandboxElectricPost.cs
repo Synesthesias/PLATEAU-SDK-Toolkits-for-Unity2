@@ -372,17 +372,5 @@ namespace PlateauToolkit.Sandbox.Runtime.ElectricPost
         {
             return m_ElectricPostWireHandler.IsShowingWire(wireID);
         }
-
-        private void OnDestroy()
-        {
-            foreach (var info in FrontConnectedPosts)
-            {
-
-            }
-
-            foreach (var info in BackConnectedPosts)
-            {
-            }
-        }
     }
 }
