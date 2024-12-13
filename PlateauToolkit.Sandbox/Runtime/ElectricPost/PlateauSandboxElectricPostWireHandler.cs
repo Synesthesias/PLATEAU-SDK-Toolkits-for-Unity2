@@ -150,7 +150,7 @@ namespace PlateauToolkit.Sandbox.Runtime
             return (index, isFront);
         }
 
-        public void TryShowWires(bool isFront, PlateauSandboxElectricConnectInfo target, bool isNoTarget = false)
+        public void TryShowWires(bool isFront, PlateauSandboxElectricConnectInfo target)
         {
             foreach (var postWire in isFront ? m_FrontPostWires : m_BackPostWires)
             {
@@ -159,7 +159,7 @@ namespace PlateauToolkit.Sandbox.Runtime
                     continue;
                 }
 
-                if (postWire.WireID == string.Empty || target == null)
+                if (postWire.WireID == string.Empty || target == null || target.m_Target == null)
                 {
                     postWire.Show(false);
                     continue;
@@ -172,11 +172,25 @@ namespace PlateauToolkit.Sandbox.Runtime
                     continue;
                 }
 
-                if (!isNoTarget && !postWire.IsTarget(target))
+                if (!postWire.IsTarget(target))
                 {
                     continue;
                 }
 
+                var targetConnectPosition = target.m_Target.GetConnectPoint(postWire.WireType, target.m_IsTargetFront);
+                postWire.SetElectricNode(targetConnectPosition);
+            }
+        }
+
+        public void TryShowWiresNoTarget(bool isFront, PlateauSandboxElectricConnectInfo target)
+        {
+            foreach (var postWire in isFront ? m_FrontPostWires : m_BackPostWires)
+            {
+                if (target.m_Target == null)
+                {
+                    postWire.Show(false);
+                    continue;
+                }
                 var targetConnectPosition = target.m_Target.GetConnectPoint(postWire.WireType, target.m_IsTargetFront);
                 postWire.SetElectricNode(targetConnectPosition);
             }
