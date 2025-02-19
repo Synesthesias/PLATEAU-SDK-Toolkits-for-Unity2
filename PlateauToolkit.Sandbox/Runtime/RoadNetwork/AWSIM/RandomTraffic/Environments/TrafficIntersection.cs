@@ -75,6 +75,11 @@ namespace AWSIM.TrafficSimulation
                 this.groupLightingOrders = groupLightingOrders;
             }
 
+            public void SetIntervalSec(float val)
+            {
+                intervalSec = val;
+            }
+
             [SerializeField] float intervalSec;
             [SerializeField] GroupLightingOrder[] groupLightingOrders;
         }
@@ -107,6 +112,9 @@ namespace AWSIM.TrafficSimulation
         [SerializeField] LayerMask colliderMask;
         [SerializeField] List<TrafficLightGroup> trafficLightGroups;
         [SerializeField] LightingSequence[] lightingSequences;
+
+        public List<TrafficLightGroup> TrafficLightGroups => trafficLightGroups;
+        public LightingSequence[] LightingSequences => lightingSequences;
 
         [Header("RoadNetwork")]
         [SerializeField]
